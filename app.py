@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, make_response
+from entidades.dados import ManipulacaoCSV
 
 app = Flask(__name__)
 
@@ -9,7 +10,11 @@ def Inicial():
 
 
 
-@app.route("/treinamento",methods=['POST'])
+@app.route("/treinamento",methods=['GET'])
 def treinamento():
-    data = request.get_json(force=True)
-    print("Teste")
+    try:
+        Manipulacao = ManipulacaoCSV()
+        Manipulacao.tratamentoCSV()
+        return jsonify({'Mensagem':'Deu certo'}), 200
+    except Exception as error:
+        return jsonify({'Erro': f'Ocorreu um erro, erro: {error}'}), 500
