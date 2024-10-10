@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 
 class ManipulacaoCSV():
-        def __init__(self):
+        def __init__(self,DataSet):
+            self.DataSet = DataSet
             self.mapeamentoUnidade = {
                 'FD': 1,
                 'UN': 2,
@@ -24,45 +25,67 @@ class ManipulacaoCSV():
                 'DZ': 18,
                 'PC': 19
             }
+            
+            self.colunasVerificacao = [
+                'codprod',
+                'descricaoproduto',
+                'embalagem',
+                'unidade',
+                'codepto',
+                'deptodescricao',
+                'codsec',
+                'secdescricao',
+                'codncmex',
+                'nbm',
+                'informacoestecnicas',
+                'codmarca',
+                'marca',
+                'codmarcatabelamarcas',
+                'marcatabelamarcas',
+            ]
+
             self.mapeamentoNomesColunas = {
                 'codprod': 'CodigoProduto',
                 'descricaoproduto': 'DescricaoProduto',
                 'embalagem': 'TipoEmbalagem',
-                'CodUnidade': 'CodUnidade',
                 'unidade': 'Unidade',
                 'codmarca': 'CodMarca',
                 'marca': 'Marca',
                 'codepto': 'CodDepartamento',
-                'descricao':'DescricaoDepartamento',
+                'deptodescricao':'DescricaoDepartamento',
                 'codsec': 'CodSecao',
-                'descricao.1': 'DescricaoSecao',
+                'secdescricao': 'DescricaoSecao',
                 'informacoestecnicas': 'InformacoesTecnicasV1',
-                'descricao1': 'InformacoesTecnicasV2',
             }
             
         def tratamentoCSV(self):
-                listaModificacoes = []
-                self.DataSet = pd.read_csv('entidades\DataSetAtualizado1209.csv',sep=';',encoding='latin')
-                self.modificacoesGeral()
-                self.alteracoesMarca(listaModificacoes)
-                self.alteracoesSecao(listaModificacoes)
-                self.alteracoesTipoEmbalagem(listaModificacoes)
-                self.alteracoesDescricaoProdutoV1(listaModificacoes)
-                self.atribuirValorCampoLista(listaModificacoes)
-                self.alteracoesDescricaoProdutoV2()
-                self.limpezaProdutos()
-                self.DataSet['DescricaoProduto'] = self.DataSet['DescricaoProduto'].str.replace(r'\s+', ' ', regex=True)
-                self.DataSet['DescricaoProduto'] = self.DataSet['DescricaoProduto'].str.lstrip()
-                self.DataSet.to_csv('entidades\DataSetFinal.csv',sep=';',index=False)
-            
-            
+            try:
+                    listaModificacoes = []
+                    self.modificacoesGeral()
+                    self.alteracoesMarca(listaModificacoes)
+                    self.alteracoesSecao(listaModificacoes)
+                    self.alteracoesTipoEmbalagem(listaModificacoes)
+                    self.alteracoesDescricaoProdutoV1(listaModificacoes)
+                    self.atribuirValorCampoLista(listaModificacoes)
+                    self.alteracoesDescricaoProdutoV2()
+                    self.limpezaProdutos()
+                    return True,'',self.DataSet
+            except Exception as error:
+                return False,'Ocorreu um erro no tratamento de dados, Erro: ' + error,[]
             
         def validarDadosCSV(self):
-            print()
+            try:
+                colunas_faltantes = [col for col in self.colunasVerificacao if col not in self.DataSet.columns]
+                if len(colunas_faltantes) > 0:
+                    string = ', '.join(colunas_faltantes)
+                    return False,'Não foram encontrados as colunas necessárias, colunas: ' + string
+                return True,''
+            except Exception as error:
+                return False,error
             
         def modificacoesGeral(self):
             self.DataSet.rename(columns=self.mapeamentoNomesColunas, inplace=True)
-
+            
             self.DataSet['CodUnidade'] = self.DataSet['Unidade'].map(self.mapeamentoUnidade)            
             self.DataSet['CodMarca'].replace([np.inf, -np.inf], 9999, inplace=True)
             self.DataSet['CodMarca'].fillna(0, inplace=True)
@@ -74,9 +97,7 @@ class ManipulacaoCSV():
                        (self.DataSet['marcatabelamarcas'] != '') & \
                        (self.DataSet['Marca'] != '0')  & \
                        (self.DataSet['Marca'] != self.DataSet['marcatabelamarcas'])
-
             self.DataSet.loc[condicao, 'Marca'] = self.DataSet.loc[condicao, 'marcatabelamarcas']
-            
             self.DataSet = self.DataSet.drop(columns={'nbm','codmarcatabelamarcas','marcatabelamarcas','codauxiliar','codauxiliar','codauxiliar2','codncmex','aceitavendafracao'},errors='ignore')
             
         def alteracoesSecao(self,ListaModificacoes):
@@ -422,7 +443,99 @@ class ManipulacaoCSV():
             self.DataSet['TipoEmbalagem'] = self.DataSet['TipoEmbalagem'].str.replace(r'(\d+)\s+KG', r'\1KG', regex=True)
             self.DataSet['TipoEmbalagem'] = self.DataSet['TipoEmbalagem'].str.replace(r'(\d+)\s+ML', r'\1ML', regex=True)
             self.DataSet['TipoEmbalagem'] = self.DataSet['TipoEmbalagem'].str.replace(r'(\d+)\s+L', r'\1L', regex=True)
-            self.DataSet['DescricaoProduto'] = self.DataSet.apply(lambda row: self.removerTipoEmbalagemDescricao(row['DescricaoProduto'], row['TipoEmbalagem']), axis=1)    
+            self.DataSet['DescricaoProduto'] = self.DataSet.apply(lambda row: self.removerTipoEmbalagemDescricao(row['DescricaoProduto'], row['TipoEmbalagem']), axis=1)  
+            
+            self.DataSet['DescricaoProduto'] = self.DataSet['DescricaoProduto'].str.replace(r'\s+', ' ', regex=True)
+            self.DataSet['DescricaoProduto'] = self.DataSet['DescricaoProduto'].str.lstrip()
+
+            self.DataSet['QtdeEmbalagem'] = 0
+            self.DataSet['PesoEmbalagemUnitaria'] = 0
+            self.DataSet['QtdeEmbalagem'] = self.DataSet['QtdeEmbalagem'].astype(int)
+            self.DataSet['PesoEmbalagemUnitaria'] = self.DataSet['PesoEmbalagemUnitaria'].astype(float)
+
+            self.DataSet.loc[self.DataSet['CodUnidade'] == 2,'QtdeEmbalagem'] = 1
+            self.DataSet.loc[self.DataSet['CodUnidade'] == 8,'QtdeEmbalagem'] = 1
+            self.DataSet.loc[self.DataSet['CodUnidade'] == 13,'QtdeEmbalagem'] = 1
+            self.DataSet.loc[self.DataSet['CodUnidade'] == 12,'QtdeEmbalagem'] = 1  
+            
+            
+            pattern = r'^\d+X'
+            ListaModificacoes.append({'CampoTroca':'QtdeEmbalagem','Filtro':(self.DataSet['QtdeEmbalagem'] == 0) & self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':self.DataSet.loc[(self.DataSet['QtdeEmbalagem'] == 0) & self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem'].str.split('X').str[0].fillna(0).astype(int)})
+            
+            self.DataSet['QtdeEmbalagem'].replace(np.nan, 0, inplace=True)
+            self.DataSet['QtdeEmbalagem'] = self.DataSet['QtdeEmbalagem'].astype(int)
+
+            pattern = r'C/(\d+)'
+            ListaModificacoes.append({'CampoTroca':'QtdeEmbalagem','Filtro':(self.DataSet['QtdeEmbalagem'] == 0) & self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':self.DataSet.loc[(self.DataSet['QtdeEmbalagem'] == 0) & self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem'].str.extract(pattern)[0].fillna(0).astype(int)})
+
+            self.DataSet['QtdeEmbalagem'].replace(np.nan, 0, inplace=True)
+            self.DataSet['QtdeEmbalagem'] = self.DataSet['QtdeEmbalagem'].astype(int)
+
+            pattern = r'^\d+KG'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split('KG').str[0].fillna(0).astype(float)})
+            
+            pattern = r'^\d+G'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':(self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split('G').str[0].fillna(0).astype(float) / 1000)})
+
+            pattern = r'^\d+ML'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':(self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split('ML').str[0].fillna(0).astype(float) / 1000)})
+
+            pattern = r'^\d+L'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split('L').str[0].fillna(0).astype(float)})
+
+            pattern = r'(\d+)[xX](\d+)(ML)'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':(self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float) / 1000)})
+
+            pattern = r'(\d+)[xX](\d+)(L)'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':(self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float) / 1000)})
+
+            pattern = r'(\d+)[xX](\d+)(KG)'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float)})
+
+            pattern = r'(\d+)[xX](\d+)(G)'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float)})
+
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['CodDepartamento'] == 7,'NovoValor':0.1})
+
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':((self.DataSet['CodDepartamento'] == 6) & (self.DataSet['CodSecao'] == 646)),'NovoValor':1})
+
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':((self.DataSet['CodDepartamento'] == 6) & (self.DataSet['PesoEmbalagemUnitaria'] == 0.0)),'NovoValor':1})
+
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':((self.DataSet['CodDepartamento'] == 4) & (self.DataSet['PesoEmbalagemUnitaria'] == 0.0)),'NovoValor':1})
+
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':((self.DataSet['CodSecao'] == 520) & (self.DataSet['PesoEmbalagemUnitaria'] == 0.0)),'NovoValor':1})
+
+            pattern = r'(\d+)[xX](\d+[\.,]?\d*)([KGG])'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':((
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem']
+                .str.replace(',', '.') 
+                .str.extract(r'[xX](\d+[\.,]?\d*)')
+                .astype(float)
+            ) / 1000)})
+
+            pattern = r'^\d+([,.]\d+)?KG' 
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem']
+                .str.replace(',', '.') 
+                .str.extract(r'(\d+[,.]?\d*)')
+                .astype(float)
+            )})
+
+            pattern = r'^\d+([,.]\d+)?[KGL]'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem']
+                .str.replace(',', '.')
+                .str.extract(r'(\d+[,.]?\d*)')
+                .astype(float)
+            )})
+
+            pattern = r'[xX](\d+[,.]?\d*)[L]'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem']
+                .str.replace(',', '.')
+                .str.extract(r'[xX](\d+[,.]?\d*)')
+                .astype(float)
+            )})
             self.atribuirValorCampoLista(ListaModificacoes)
             
         def alteracoesMarca(self,ListaModificacoes):
@@ -2208,7 +2321,6 @@ class ManipulacaoCSV():
             self.editarDescricaoProduto(self.DataSet,6341,'VINHO IMP CHI SAUVIGNON BLANC BRANCO')
             self.editarDescricaoProduto(self.DataSet,12778,'VINHO IMP CHI SAUVIGNON BLANC')
             self.editarDescricaoProduto(self.DataSet,11422,'MACA')
-            self.editarDescricaoProduto(self.DataSet,11559,'MANGA')
             self.editarDescricaoProduto(self.DataSet,12901,'VINHO IMP CHI CARMENERE')
             self.editarDescricaoProduto(self.DataSet,9402,'VINHO IMP CHI CARMENERE')
             self.editarDescricaoProduto(self.DataSet,12385,'VINHO IMP CHI SAUVIGNON BLANC')
@@ -2324,8 +2436,8 @@ class ManipulacaoCSV():
             self.DataSet.drop(self.DataSet[self.DataSet['DescricaoProduto'].str.contains(fr'\bS/C\b',case=False, regex=True) & (self.DataSet['CodDepartamento'] == 1) & (self.DataSet['CodSecao'] == 4)].index, inplace = True)
             self.DataSet.drop(self.DataSet[self.DataSet['DescricaoProduto'].str.contains(fr'\bS/CAR\b',case=False, regex=True) & (self.DataSet['CodDepartamento'] == 1) & (self.DataSet['CodSecao'] == 4)].index, inplace = True)
             self.DataSet.drop(self.DataSet[self.DataSet['DescricaoProduto'].str.contains(fr'\bS/CART\b',case=False, regex=True) & (self.DataSet['CodDepartamento'] == 1) & (self.DataSet['CodSecao'] == 4)].index, inplace = True)
-            
-            
+            self.DataSet['DescricaoProduto'] = self.DataSet['DescricaoProduto'].str.replace(r'\s+', ' ', regex=True)
+            self.DataSet['DescricaoProduto'] = self.DataSet['DescricaoProduto'].str.lstrip()
             
         @staticmethod
         def mudarCodMarcaSemRegistro(Data,Palavra,CodMarca,CampoFiltro):
@@ -2339,11 +2451,9 @@ class ManipulacaoCSV():
         def mudarCodMarcaJaRegistrada(Data,Palavra,CodMarca,CampoFiltro):
             Data.loc[Data[CampoFiltro].str.contains(rf'\b{Palavra}\b',case=False, regex=True), 'CodMarca'] = CodMarca
 
-
         @staticmethod
         def mudarMarcaJaRegistrada(Data,Palavra,Marca,CampoFiltro):
             Data.loc[Data[CampoFiltro].str.contains(rf'\b{Palavra}\b',case=False, regex=True), 'Marca'] = Marca
-
 
         @staticmethod
         def removerLinhaPorCodProduto(Data,CodigoProduto):
@@ -2362,7 +2472,6 @@ class ManipulacaoCSV():
             else:
                 print(f"Seção com código {CodigoSecao} não encontrada.")
 
-
         @staticmethod
         def adicionarPalavrasSecaoDescricao(Data,CodigoSecao,TextoAdicionar,Inicio):
             if CodigoSecao in Data['CodSecao'].values:
@@ -2380,7 +2489,6 @@ class ManipulacaoCSV():
             else:
                 print(f"Seção com código {CodigoSecao} não encontrada.")
 
-
         @staticmethod
         def substituirPalavrasSecaoDescricao(Data,CodigoSecao,TextoSubstituir,NovoTexto):
             if CodigoSecao in Data['CodSecao'].values:
@@ -2390,7 +2498,6 @@ class ManipulacaoCSV():
             else:
                 print(f"Seção com código {CodigoSecao} não encontrada.")
                 
-             
         @staticmethod   
         def editarDescricaoProduto(Data,CodigoProduto,NovoTexto):
             if CodigoProduto in Data['CodigoProduto'].values:
@@ -2405,10 +2512,6 @@ class ManipulacaoCSV():
             Marcas = Marcas.split(',')
             for marca in Marcas:
                 Descricao = Descricao.replace(marca.strip(), '').strip()
-                if marca == 'C.LARGO':
-                    print(Descricao)
-                if marca == 'CAMPO LARGO':
-                    print(Marcas)
             return Descricao
         
         def atribuirValorCampoLista(self,Lista):
