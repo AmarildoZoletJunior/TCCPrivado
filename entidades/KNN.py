@@ -31,10 +31,10 @@ class AlgoritmoKNN():
 
     def recomendarTodosProdutos(self):
         recomendacoes = []
+        dataSetOriginal = pd.read_csv(rf'C:\Users\amjun\Desktop\Catolica\TCC\TCCPrivado\arquivos\datasets\DataSetOriginal.csv',sep=';',encoding='latin')
         
         for idx, produto in self.DataSet.iterrows():
             codigo_produto = produto['CodigoProduto']
-            
             
             item_base_index = self.DataSet[self.DataSet['CodigoProduto'] == codigo_produto].index
             if not item_base_index.empty:
@@ -42,6 +42,7 @@ class AlgoritmoKNN():
                 distances, indices = self.model.kneighbors([self.combined_features[position]])
 
                 item_base = self.DataSet.loc[position]
+                
                 
                 if len(indices[0]) > 1:
                     similar_indices = [i for i in indices[0] if i != position]
@@ -55,61 +56,34 @@ class AlgoritmoKNN():
                     (produto, distancia) for produto, distancia in zip(self.DataSet.loc[similar_indices].itertuples(index=False), similar_distances) 
                     if distancia <= 0.88
                 ]
+                                
+                ArrayProdutosOriginal = []
+                for produtoItem in produtos_recomendados:
+                    codigoProduto = produtoItem[0].CodigoProduto
+                    produtoOriginal = dataSetOriginal[dataSetOriginal['codprod'] == codigoProduto]
+                    
+                    if not produtoOriginal.empty:
+                        produto_info = produtoOriginal.iloc[0].to_dict()  # Converte a Series em dicionário
+                        ArrayProdutosOriginal.append(produto_info)
+                    else:
+                        print(f"Produto com código {codigoProduto} não encontrado.")
 
                 recomendacoes.append({
                     'ProdutoBase': {
                         'CodigoProduto': int(item_base['CodigoProduto']),
                         'DescricaoProduto': item_base['DescricaoProduto'],
                         'Marca': item_base['Marca'],
+                        'Departamento': item_base['DescricaoDepartamento'],
+                        'Seção': item_base['DescricaoSecao']
                     },
                     'Recomendacoes': [
                         {
-                            'CodigoProduto': int(produto.CodigoProduto),
-                            'DescricaoProduto': produto.DescricaoProduto,
-                            'Marca': produto.Marca,
-                            'Distancia': float(distancia)
-                        } for produto, distancia in produtos_recomendados
+                            'CodigoProduto': produto['codprod'],
+                            'DescricaoProduto': produto['descricaoproduto'],
+                            'Marca': produto['marca'],
+                            'Departamento': produto['deptodescricao'],
+                            'Seção': produto['secdescricao']
+                        } for produto in ArrayProdutosOriginal
                     ]
                 })
-
-            else:
-                print(f"Produto com código {codigo_produto} não encontrado no DataSet.")
-        
         return recomendacoes
-
-
-
-    # def recomendarTodosProdutos(self):
-    #     recomendacoes = []
-        
-    #     # Iterar sobre cada registro no DataSet
-    #     for idx, produto in self.DataSet.iterrows():
-    #         codigo_produto = produto['CodigoProduto']
-            
-    #         # Encontrar o índice do produto base
-    #         item_base_index = self.DataSet[self.DataSet['CodigoProduto'] == codigo_produto].index
-    #         if not item_base_index.empty:
-    #             position = item_base_index[0]  # Pega o primeiro índice encontrado (agora deve estar sincronizado)
-    #             distances, indices = self.model.kneighbors([self.combined_features[position]])
-
-    #             item_base = self.DataSet.loc[position]  # Acessa diretamente pela posição no DataFrame (sincronizada)
-    #             print(distances)
-    #             # Verifica se há vizinhos suficientes
-    #             if len(indices[0]) > 1:
-    #                 # Ignora o próprio produto base (índice 0), e pega os próximos vizinhos
-    #                 similar_indices = [i for i in indices[0] if i != position]
-    #             else:
-    #                 similar_indices = []
-
-    #             # Produtos recomendados
-    #             produtos_recomendados = self.DataSet.loc[similar_indices][['CodigoProduto']]
-    #             recomendacoes.append({
-    #                 'ProdutoBase': {
-    #                     'CodigoProduto': int(item_base['CodigoProduto'])
-    #                 },
-    #                 'Recomendacoes': produtos_recomendados.to_dict(orient='records'),
-    #             })
-
-    #         else:
-    #             print(f"Produto com código {codigo_produto} não encontrado no DataSet.")
-    #     return recomendacoes  # Retorna o JSON com todas as recomendações

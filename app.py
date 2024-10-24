@@ -43,7 +43,6 @@ def treinamento():
             qtde_recomendacao = int(qtde_recomendacao)
         except ValueError:
             return jsonify({'Erro': 'NumPca e QtdeRecomendacao devem ser números inteiros'}), 400
-        
         ManipulacaoDados = ManipulacaoCSV(csv_data)
         response, message = ManipulacaoDados.validarDadosCSV()
         if not response:
@@ -52,8 +51,6 @@ def treinamento():
         response, message, dataSet = ManipulacaoDados.tratamentoCSV()
         if not response:
             return jsonify({'Mensagem': message}), 400
-        
-
         KNN = AlgoritmoKNN(dataSet, num_pca, qtde_recomendacao)
         KNN.treinamentoKNN()
         recomendacao = KNN.recomendarTodosProdutos()

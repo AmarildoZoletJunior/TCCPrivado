@@ -204,7 +204,6 @@ class ManipulacaoCSV():
             ListaModificacoes.append({'CampoTroca':'DescricaoSecao','Filtro':self.DataSet['CodSecao'] == 10010,'NovoValor':"GORDURA/OLEO ESPECIAIS"})
             ListaModificacoes.append({'CampoTroca':'DescricaoSecao','Filtro':(self.DataSet['CodSecao'] == 234) & (self.DataSet['DescricaoProduto'].str.contains(fr'\bGELATINA\b',case=False, regex=True)),'NovoValor': "GELATINAS"})
             
-            
             # Modificar código da seção
             ListaModificacoes.append({'CampoTroca':'CodSecao','Filtro':(self.DataSet['CodSecao'] == 616) & (self.DataSet['DescricaoProduto'].str.contains(fr'\bBAND.ISOP. RASA\b',case=False,regex=True)),'NovoValor':612})
             ListaModificacoes.append({'CampoTroca':'CodSecao','Filtro':(self.DataSet['CodSecao'] == 612) & (self.DataSet['DescricaoProduto'].str.contains(fr'\bHAMBURG.ISOP.\b',case=False,regex=True)),'NovoValor':614})
