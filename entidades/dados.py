@@ -75,9 +75,9 @@ class ManipulacaoCSV():
             
         def validarDadosCSV(self):
             try:
-                colunas_faltantes = [col for col in self.colunasVerificacao if col not in self.DataSet.columns]
-                if len(colunas_faltantes) > 0:
-                    string = ', '.join(colunas_faltantes)
+                ColunasFaltantes = [col for col in self.colunasVerificacao if col not in self.DataSet.columns]
+                if len(ColunasFaltantes) > 0:
+                    string = ', '.join(ColunasFaltantes)
                     return False,'Não foram encontrados as colunas necessárias, colunas: ' + string
                 return True,''
             except Exception as error:
@@ -380,61 +380,18 @@ class ManipulacaoCSV():
             ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 2111,'NovoValor':'12X1'})
             ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 2113,'NovoValor':'12X1'})
             ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 4019,'NovoValor':'8X1'})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 2113,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 2113, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 7834,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 7834, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 7350,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 7350, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 9840,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 9840, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 9841,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 9841, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12346,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 12346, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12774,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 12774, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12936,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 12936, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 4187,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 4187, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 4190,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 4190, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 10872,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 10872, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 10874,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 10874, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 10875,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 10875, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 10876,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 10876, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 6746,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 6746, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11919,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11919, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 6745,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 6745, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 10852,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 10852, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12259,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 12259, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 1689,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 1689, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11920,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11920, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11183,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11183, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11184,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11184, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11185,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11185, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11186,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11186, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11187,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11187, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11188,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11188, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11189,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11189, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11190,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11190, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11191,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11191, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11192,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11192, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11193,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11193, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11009,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11009, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11008,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11008, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11007,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11007, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 6140,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 6140, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 6135,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 6135, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 10192,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 10192, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11163,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11163, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11177,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11177, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 3017,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 3017, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 3890,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 3890, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 8628,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 8628, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 3891,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 3891, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 8555,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 8555, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 2563,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 2563, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 6682,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 6682, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11294,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11294, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11973,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11973, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11974,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11974, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11975,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11975, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 11976,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 11976, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 3893,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 3893, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 2317,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 2317, 'TipoEmbalagem']})
-            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 6129,'NovoValor':"1X" + self.DataSet.loc[self.DataSet['CodigoProduto'] == 6129, 'TipoEmbalagem']})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 4351,'NovoValor':'C/50'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12031,'NovoValor':'24X18G'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12854,'NovoValor':'24X18G'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12606,'NovoValor':'10X18G'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12607,'NovoValor':'10X18G'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12254,'NovoValor':'15X12GR'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12255,'NovoValor':'15X12GR'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 5484,'NovoValor':'C/250'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12203,'NovoValor':'C/50'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 12204,'NovoValor':'C/50'})
+            ListaModificacoes.append({'CampoTroca':'TipoEmbalagem','Filtro':self.DataSet['CodigoProduto'] == 2668,'NovoValor':'C/1'})
+
             self.DataSet['TipoEmbalagem'].replace('1,005KG', '1KG', inplace=True)
             self.DataSet['TipoEmbalagem'].replace('1,002KG', '1KG', inplace=True)
             self.DataSet['TipoEmbalagem'].replace('1,008KG', '1KG', inplace=True)
@@ -451,12 +408,9 @@ class ManipulacaoCSV():
             self.DataSet['PesoEmbalagemUnitaria'] = 0
             self.DataSet['QtdeEmbalagem'] = self.DataSet['QtdeEmbalagem'].astype(int)
             self.DataSet['PesoEmbalagemUnitaria'] = self.DataSet['PesoEmbalagemUnitaria'].astype(float)
+            self.DataSet['TipoEmbalagem'] = self.DataSet['TipoEmbalagem'].str.strip()
 
-            self.DataSet.loc[self.DataSet['CodUnidade'] == 2,'QtdeEmbalagem'] = 1
-            self.DataSet.loc[self.DataSet['CodUnidade'] == 8,'QtdeEmbalagem'] = 1
-            self.DataSet.loc[self.DataSet['CodUnidade'] == 13,'QtdeEmbalagem'] = 1
-            self.DataSet.loc[self.DataSet['CodUnidade'] == 12,'QtdeEmbalagem'] = 1  
-            
+            ListaModificacoes.append({'CampoTroca':'QtdeEmbalagem','Filtro':(self.DataSet['CodUnidade'].isin([2,8,12,13])),'NovoValor':1})
             
             pattern = r'^\d+X'
             ListaModificacoes.append({'CampoTroca':'QtdeEmbalagem','Filtro':(self.DataSet['QtdeEmbalagem'] == 0) & self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':self.DataSet.loc[(self.DataSet['QtdeEmbalagem'] == 0) & self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem'].str.split('X').str[0].fillna(0).astype(int)})
@@ -469,7 +423,30 @@ class ManipulacaoCSV():
 
             self.DataSet['QtdeEmbalagem'].replace(np.nan, 0, inplace=True)
             self.DataSet['QtdeEmbalagem'] = self.DataSet['QtdeEmbalagem'].astype(int)
+            
+            pattern = r'\d+X\d+UN'
+            ListaModificacoes.append({'CampoTroca':'QtdeEmbalagem','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True),'NovoValor':(
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True), 'TipoEmbalagem'].str.split('X').str[0].astype(int) *  # valor antes do "X"
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True), 'TipoEmbalagem'].str.split('X').str[1].str.replace('UN', '').astype(int)  # valor depois do "X" sem o "UN"
+            )})
+            
+            pattern = r'\d+X\d+$'
+            ListaModificacoes.append({'CampoTroca':'QtdeEmbalagem','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True),'NovoValor':(
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True), 'TipoEmbalagem'].str.split('X').str[0].astype(int) *  # valor antes do "X"
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True), 'TipoEmbalagem'].str.split('X').str[1].astype(int)  # valor depois do "X" sem o "UN"
+            )})
+        
+            patterns = [
+                r'^\d+(?:,\d+)?KG$',  
+                r'^\d+(?:,\d+)?ML$',  
+                r'^\d+(?:,\d+)?LT$', 
+                r'^\d+(?:,\d+)?L$',   
+                r'^\d+(?:,\d+)?G$'  
+            ]
 
+            for pattern in patterns:
+                ListaModificacoes.append({'CampoTroca':'QtdeEmbalagem','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True)) & (self.DataSet['CodUnidade'] != 2),'NovoValor':1})
+            
             pattern = r'^\d+KG'
             ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split('KG').str[0].fillna(0).astype(float)})
             
@@ -482,18 +459,6 @@ class ManipulacaoCSV():
             pattern = r'^\d+L'
             ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split('L').str[0].fillna(0).astype(float)})
 
-            pattern = r'(\d+)[xX](\d+)(ML)'
-            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':(self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float) / 1000)})
-
-            pattern = r'(\d+)[xX](\d+)(L)'
-            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':(self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float) / 1000)})
-
-            pattern = r'(\d+)[xX](\d+)(KG)'
-            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float)})
-
-            pattern = r'(\d+)[xX](\d+)(G)'
-            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float)})
-
             ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['CodDepartamento'] == 7,'NovoValor':0.1})
 
             ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':((self.DataSet['CodDepartamento'] == 6) & (self.DataSet['CodSecao'] == 646)),'NovoValor':1})
@@ -504,37 +469,71 @@ class ManipulacaoCSV():
 
             ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':((self.DataSet['CodSecao'] == 520) & (self.DataSet['PesoEmbalagemUnitaria'] == 0.0)),'NovoValor':1})
 
-            pattern = r'(\d+)[xX](\d+[\.,]?\d*)([KGG])'
-            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':((
-                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem']
-                .str.replace(',', '.') 
-                .str.extract(r'[xX](\d+[\.,]?\d*)')
-                .astype(float)
-            ) / 1000)})
+            pattern = r'(\d+)[xX](\d+)(ML)'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':(self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float) / 1000)})
 
-            pattern = r'^\d+([,.]\d+)?KG' 
+            pattern = r'(\d+)[xX](\d+)(L)'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':(self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float))})
+
+            pattern = r'(\d+)[xX](\d+)(KG)'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float)})
+
+            pattern = r'(\d+)[xX](\d+)(G)'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['TipoEmbalagem'].str.contains(pattern)),'NovoValor':self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern)), 'TipoEmbalagem'].str.split(r'[^\d]+').str[1].fillna(0).astype(float) / 1000})
+
+
+            pattern = r'^\d+(?:[,.]\d+)?L'
             ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
-                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem']
-                .str.replace(',', '.') 
-                .str.extract(r'(\d+[,.]?\d*)')
-                .astype(float)
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True), 'TipoEmbalagem'].str.split('L').str[0].fillna(0).str.replace(',', '.', regex=False).astype(float)
+            )})
+            
+            pattern = r'^\d+(?:[,.]\d+)?KG'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
+                    self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True)), 'TipoEmbalagem'].str.split('KG').str[0].fillna(0).str.replace(',', '.', regex=False).astype(float)
+                )
+            })
+            
+            pattern = r'^\d+(?:[,.]\d+)?G'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
+                self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True)), 'TipoEmbalagem'].str.split('G').str[0].fillna(0).str.replace(',', '.', regex=False).astype(float) / 1000
             )})
 
-            pattern = r'^\d+([,.]\d+)?[KGL]'
+            pattern = r'^\d+(?:[,.]\d+)?ML'
             ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
-                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem']
-                .str.replace(',', '.')
-                .str.extract(r'(\d+[,.]?\d*)')
-                .astype(float)
+                self.DataSet.loc[(self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True)), 'TipoEmbalagem'].str.split('ML').str[0].fillna(0).str.replace(',', '.', regex=False).astype(float) / 1000
             )})
-
-            pattern = r'[xX](\d+[,.]?\d*)[L]'
+            
+            pattern = r'^\d+X\d+[,.]?\d*G$'
             ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
-                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern), 'TipoEmbalagem']
-                .str.replace(',', '.')
-                .str.extract(r'[xX](\d+[,.]?\d*)')
-                .astype(float)
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True), 'TipoEmbalagem']
+                .str.extract(r'X(\d+[,.]?\d*)G')[0]  
+                .str.replace(',', '.', regex=False)  
+                .astype(float) 
+            )  / 1000})
+            
+            pattern = r'^\d+X\d+[,.]?\d*KG$'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True), 'TipoEmbalagem']
+                .str.extract(r'X(\d+[,.]?\d*)KG')[0]  
+                .str.replace(',', '.', regex=False)  
+                .astype(float)  
             )})
+                       
+            
+            pattern = r'^\d+X\d+[,.]?\d*L$'
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':self.DataSet['TipoEmbalagem'].str.contains(pattern),'NovoValor':(
+                self.DataSet.loc[self.DataSet['TipoEmbalagem'].str.contains(pattern, regex=True), 'TipoEmbalagem']
+                .str.extract(r'X(\d+[,.]?\d*)L')[0]  
+                .str.replace(',', '.', regex=False)
+                .astype(float)  
+            )})           
+            
+            self.DataSet['PesoEmbalagemUnitaria'].replace(np.nan, 0, inplace=True)
+            self.DataSet['PesoEmbalagemUnitaria'] = self.DataSet['PesoEmbalagemUnitaria'].astype(float)
+         
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['CodSecao'].isin([308,306,532,534])),'NovoValor':1})
+            ListaModificacoes.append({'CampoTroca':'PesoEmbalagemUnitaria','Filtro':(self.DataSet['CodDepartamento'].isin([7])),'NovoValor':1})
+            
             self.atribuirValorCampoLista(ListaModificacoes)
             
         def alteracoesMarca(self,ListaModificacoes):
