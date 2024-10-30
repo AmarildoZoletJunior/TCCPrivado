@@ -59,6 +59,56 @@ Este projeto tem como foco criar um algoritmo de recomendação de produtos com 
 
 
 
+# Diagramas
+## Diagrama de classe
+
+```mermaid
+classDiagram
+    class Usuarios {
+        +Integer USUid
+        +String USUsername
+        +String USUpassword
+        +DateTime USUcreated_at
+        +relationship Modelos[0..*]
+        +relationship Arquivos[0..*]
+    }
+    
+    class Modelos {
+        +Integer MDId
+        +String MDVersao
+        +LargeBinary MDArquivo
+        +Integer MDIdArquivoProd
+        +LargeBinary MDArquivoProdAlterado
+        +LargeBinary MDArquivoScaler
+        +LargeBinary MDArquivoEncoder
+        +LargeBinary MDArquivoPca
+        +LargeBinary MDVetorTF
+        +Integer MDNumeroPCA
+        +Integer MDQtdeRecomendacao
+        +Integer MDIdUsuario
+        +Date MDDataPostagem
+        +relationship Usuarios [1]
+        +relationship Arquivos [0..*]
+    }
+    
+    class Arquivos {
+        +Integer APId
+        +Date APDataPostagem
+        +LargeBinary APArquivo
+        +String APArquivoDelimiter
+        +Integer APQtdeProdutos
+        +Integer APIdUsuario
+        +String APVersao
+        +relationship Usuarios [1]
+        +relationship Modelos [0..*]
+    }
+    
+    Usuarios "1" --o "0..*" Modelos : contains
+    Usuarios "1" --o "0..*" Arquivos : contains
+    Modelos "0..*" --o "1" Arquivos : references
+```
+
+
 # Tecnologias Utilizadas
 
 ### Back-End
