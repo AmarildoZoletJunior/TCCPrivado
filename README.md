@@ -14,7 +14,7 @@
 
 
 # Objetivo
-Este projeto 
+Este projeto tem como foco criar um algoritmo de recomendação de produtos com base na similaridade entre os produtos, utilizando variáveis como peso da embalagem, quantidade que contém em cada pacote, descrição do produto, unidade de venda, código da marca, código da seção e código do departamento. O intuito principal é descobrir quais produtos que contém em uma base de dados é mais semelhante ao produto base escolhido pelo usuário. Será utilizado KNN como algoritmo para aprendizagem e recomendação.
 
 # Escopo
 1. Manipulação de arquivos CSV
@@ -35,17 +35,17 @@ Este projeto
 # Requisitos do Projeto
 ## Requisitos Funcionais
 ### 1. Manipulação de Arquivos CSV
-1.1. O sistema deve permitir o upload de arquivos no formato CSV para a base de dados. 1.2. O sistema deve possibilitar a remoção de arquivos CSV da base de dados.
+1. O sistema deve permitir o upload de arquivos no formato CSV para a base de dados. 1.2. O sistema deve possibilitar a remoção de arquivos CSV da base de dados.
 
 ### 2. Tratamento de Dados
-2.1. O sistema deve permitir que o usuário edite valores específicos em campos de um arquivo CSV. 2.2. O sistema deve possibilitar a remoção de valores específicos em campos de um arquivo CSV. 2.3. O sistema deve permitir a substituição de valores específicos em campos de um arquivo CSV. 2.4. O sistema deve possibilitar a exclusão de registros de tratamento de dados de um arquivo CSV específico.
+2. O sistema deve permitir que o usuário edite valores específicos em campos de um arquivo CSV. 2.2. O sistema deve possibilitar a remoção de valores específicos em campos de um arquivo CSV. 2.3. O sistema deve permitir a substituição de valores específicos em campos de um arquivo CSV. 2.4. O sistema deve possibilitar a exclusão de registros de tratamento de dados de um arquivo CSV específico.
 
 ### 3. Treinamento
-3.1. O sistema deve buscar e aplicar automaticamente todos os registros de tratamento de dados previamente definidos para o dataset alvo. 3.2. O sistema deve realizar o treinamento de um modelo de recomendação com base nos dados tratados do dataset alvo.
+3. O sistema deve buscar e aplicar automaticamente todos os registros de tratamento de dados previamente definidos para o dataset alvo. 3.2. O sistema deve realizar o treinamento de um modelo de recomendação com base nos dados tratados do dataset alvo.
 
 ### 4. Recomendação
-4.1. O sistema deve recomendar produtos relacionados a um produto específico disponível na base de dados. 
-4.2. O sistema deve fornecer recomendações de produtos específicos com base no código do produto solicitado.
+4. O sistema deve recomendar produtos relacionados a um produto específico disponível na base de dados. 
+5. O sistema deve fornecer recomendações de produtos específicos com base no código do produto solicitado.
 
 
 ## Requisitos Não Funcionais

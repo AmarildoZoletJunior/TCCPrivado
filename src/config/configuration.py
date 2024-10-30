@@ -2,7 +2,7 @@ from configparser import ConfigParser
 import os
 
 # Caminho absoluto para o arquivo de configuração
-config_file = r'C:\Users\amjun\Desktop\Catolica\TCC\TCCPrivado\config\config.ini'
+config_file = r'C:\Users\amjun\Desktop\Catolica\TCC\TCCPrivado\src\config\config.ini'
 
 # Inicializa o ConfigParser
 conf_obj = ConfigParser()
@@ -14,6 +14,18 @@ else:
     raise FileNotFoundError(f"Arquivo de configuração não encontrado: {config_file}")
 
 try:
+    
+    # Acessando a seção 'DataBase'
+    if 'DataBase' in conf_obj:
+        config = conf_obj['DataBase']
+        DRIVER = config.get('DRIVER', None)
+        SERVER = config.get('SERVER', None)
+        DATABASE = config.get('DATABASE', None)
+
+        # Verifica se as chaves foram corretamente obtidas
+        if DRIVER is None or SERVER is None or DATABASE is None:
+            raise ValueError("Alguma chave está faltando na seção [DataBase].")
+        
     # Acessando a seção 'Parametros'
     if 'Parametros' in conf_obj:
         config = conf_obj['Parametros']

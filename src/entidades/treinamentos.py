@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-from config import  configuration
+from src.config import  configuration
 import numpy as np
 import joblib
 import pandas as pd
@@ -53,7 +53,7 @@ class AlgoritmoKNN():
         
 
 
-    def RecomendarProdutosPorCodigo(self, codigo_produto):
+    def RecomendarProdutosPorCodigo(self, codigo_produto,listaProdutosEsperados):
         caminho_modelo = f'{configuration.UrlPastaModelos}/modelo_knn.pkl'
         caminho_tfidf = f'{configuration.UrlPastaParametros}/vetor_tfidf.pkl'
         caminho_pca = f'{configuration.UrlPastaParametros}/pca_transform.pkl'
@@ -289,3 +289,36 @@ class AlgoritmoKNN():
         return Recall
     
     
+    
+    
+    def Treinar(self):
+        VetorTF = TfidfVectorizer()
+        VetorTFMatrix = VetorTF.fit_transform(self.DataSet['DescricaoProduto'])
+
+        pca = PCA(n_components=self.NumPCA)
+        TFReduzido = pca.fit_transform(VetorTFMatrix.toarray())
+        
+        VariaveisNumericas = self.DataSet[['PesoEmbalagemUnitaria', 'QtdeEmbalagem']]
+        Scaler = StandardScaler()
+        EscalarVariaveisNumericas = Scaler.fit_transform(VariaveisNumericas)
+
+        VariveisCategoricas = self.DataSet[['CodDepartamento', 'CodSecao']]
+        Encoder = OneHotEncoder(sparse_output=False)
+        EncoderCategorico = Encoder.fit_transform(VariveisCategoricas)
+        
+        FatorPesoVariaveis = np.array([5, 8])
+        VariveisBalanceadas = EscalarVariaveisNumericas * FatorPesoVariaveis
+        
+        self.FeaturesCombinadas = np.hstack([TFReduzido, EncoderCategorico, VariveisBalanceadas])
+
+        self.Modelo = NearestNeighbors(n_neighbors=self.QtdeRecomendacao + 1, metric='nan_euclidean') 
+        self.Modelo.fit(self.FeaturesCombinadas)
+        
+        joblib.dump(VetorTF, f'{configuration.UrlPastaParametros}/vetor_tfidf.pkl')
+        joblib.dump(pca, f'{configuration.UrlPastaParametros}/pca_transform.pkl')
+        joblib.dump(Scaler, f'{configuration.UrlPastaParametros}/standard_scaler.pkl')
+        joblib.dump(Encoder, f'{configuration.UrlPastaParametros}/onehot_encoder.pkl')
+        joblib.dump(self.Modelo, f'{configuration.UrlPastaModelos}/modelo_knn.pkl')
+        csv_path = f'{configuration.UrlPastaDataSet}/dataSetTreinamento.csv'
+        self.DataSet.to_csv(csv_path, index=False, encoding='utf-8')
+        return 200,''
