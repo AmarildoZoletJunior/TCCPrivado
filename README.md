@@ -5,6 +5,7 @@
   *  [Requisitos Não Funcionais](#Requisitos-Não-Funcionais)
 
 * [Tecnologias Utilizadas](#Tecnologias-Utilizadas)
+  * [Banco de dados](#Iniciar-Banco-de-dados)
   * [Back-End](#Back-End)
   * [CI/CD](#CICD)
   * [Testes de Qualidade](#Testes-de-qualidade)
@@ -102,7 +103,6 @@ classDiagram
         +relationship Usuarios [1]
         +relationship Modelos [0..*]
     }
-    
     Usuarios "1" --o "0..*" Modelos : contains
     Usuarios "1" --o "0..*" Arquivos : contains
     Modelos "0..*" --o "1" Arquivos : references
@@ -115,10 +115,16 @@ classDiagram
   * Python
     * Poetry
       * Flask
-      * SkLearn
+      * Scikit-Learn
       * Pandas
       * Numpy
+      * Flasgger
+      * NumPy
       * Re
+      * Pandas
+      * Pyodbc
+      * Pyjwt
+      * SqlAlchemy 
   
 
 ### CI/CD
@@ -130,6 +136,17 @@ classDiagram
 
 
 # Como iniciar
+### Iniciar Banco de dados
+> [!WARNING]
+> Este projeto utiliza SQL Server.
+  1. Baixe o SQL Server neste link: https://www.microsoft.com/pt-br/sql-server/sql-server-downloads
+  2. Inicie sua instância do SQL Server.
+  3. Abra o arquivo conf.ini que tem de exemplo e preencha cada variável necessária na classe ConfiguracaoBancoDados.
+     * As variáveis que devem ser preenchidas são:
+       * DRIVER | Exemplo = ODBC Driver 17 for SQL Server
+       * SERVER | Exemplo = localhost
+       * DATABASE | Exemplo = RecomendacaoProdutos
+
 ## Repositório
 Para clonar o repositório, você precisa ter o Git Bash, GitHub Desktop ou se preferir pode clonar o projeto via CURL/WGET.
 1. Faça o clone do repositório
