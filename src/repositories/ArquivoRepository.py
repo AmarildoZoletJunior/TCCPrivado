@@ -80,7 +80,7 @@ class ArquivoRepository():
         csv_content_binary = csv_content_str.encode('ISO-8859-1')
         
         data = Database()
-        response = data.DoInsert(Arquivos,APArquivo = csv_content_binary,APArquivoDelimiter = delimiter,APQtdeProdutos = len(self.DataSet),APIdUsuario = idUsuario,APVersao = versao)
+        response = data.Insercao(Arquivos,APArquivo = csv_content_binary,APArquivoDelimiter = delimiter,APQtdeProdutos = len(self.DataSet),APIdUsuario = idUsuario,APVersao = versao)
         if response is None:
             return 400,'Ocorreu um erro ao inserir o registro.'
         return 200,''
@@ -92,24 +92,24 @@ class ArquivoRepository():
         if not isinstance(idArquivo,int):
             return 400,'o id do arquivo deve ser do tipo inteiro.'
         dataBase = Database()
-        data = dataBase.DoSelect(Arquivos,APId = idArquivo)
+        data = dataBase.SelecionarRegistro(Arquivos,APId = idArquivo)
         if len(data) == 0:
             return 400,f'Não foi encontrado o arquivo com o id:{idArquivo}'
-        response = dataBase.DoDelete(Arquivos,APId = idArquivo)
+        response = dataBase.DeletarRegistro(Arquivos,APId = idArquivo)
         if response is None:
             return 400,'Ocorreu um erro ao deletar o registro.'
         return 200,''
         
     def ListarArquivos(self):
         dataBase = Database()
-        data = dataBase.DoSelect(Arquivos)
+        data = dataBase.SelecionarRegistro(Arquivos)
         if len(data) == 0:
             return 400,f'Não foi encontrado nenhum arquivo.',''
         return 200,'',data
     
     def ListarArquivoUnico(self,idArquivo):
         dataBase = Database()
-        data = dataBase.DoSelect(Arquivos,APId = idArquivo)
+        data = dataBase.SelecionarRegistro(Arquivos,APId = idArquivo)
         if len(data) == 0:
             return 400,f'Não foi encontrado nenhum arquivo.',''
         return 200,'',data

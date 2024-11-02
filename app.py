@@ -5,19 +5,21 @@ from flask import Flask, request, jsonify
 from src.repositories.ArquivoRepository import ArquivoRepository
 from src.repositories.ModeloRepository import ModeloRepository
 from src.repositories.UsuarioRepository import UserRepository
-
-from src.entidades.tratamentoDados import ManipulacaoCSV
-from src.entidades.treinamentos import AlgoritmoKNN
 from src.config import  configuration
 import jwt
 from functools import wraps
 import datetime
+from flask_cors import CORS 
+
+from flasgger import Swagger
 
 
 
 
 data = Database()
 app = Flask(__name__)
+swagger = Swagger(app)
+CORS(app)
 
 secret = '1111'
 
@@ -116,95 +118,63 @@ def ResetPassword():
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
         
 # endregion                 
-        
-# region EndPointAntigo
-
-    
-@app.route("/treinamentoAlgoritmo", methods=['POST'])
-def Treinamento():
-    try:
-        if 'file' not in request.files:
-            return jsonify({'Erro': 'Nenhum arquivo enviado'}), 400
-        
-        file = request.files['file']
-        
-        if file.filename == '':
-            return jsonify({'Erro': 'Nenhum nome de arquivo enviado'}), 400
-        if not file.filename.endswith('.csv'):
-            return jsonify({'Erro': 'O arquivo não é CSV'}), 400
-
-        csv_data = pd.read_csv(io.StringIO(file.stream.read().decode('ISO-8859-1')), delimiter=';')
-        num_pca = request.form.get('NumPca')
-        qtde_recomendacao = request.form.get('QtdeRecomendacao')
-        
-        if not num_pca:
-            return jsonify({'Erro': 'Parâmetro NumPca é obrigatórios'}), 400
-        
-        if not qtde_recomendacao:
-            return jsonify({'Erro': 'Parâmetro QtdeRecomendacao é obrigatórios'}), 400
-
-        if len(csv_data) < int(num_pca):
-            return jsonify({'Erro':f'O número de componente deve ser menor ou igual a quantidade de registros, quantidade de registros do CSV é: {len(csv_data)}'})
-
-
-        try:
-            num_pca = int(num_pca)
-            qtde_recomendacao = int(qtde_recomendacao)
-        except ValueError:
-            return jsonify({'Erro': 'NumPca e QtdeRecomendacao devem ser números inteiros'}), 400
-        
-        ManipulacaoDados = ManipulacaoCSV(csv_data)
-        response, message = ManipulacaoDados.validarDadosCSV()
-        if not response:
-            return jsonify({'Mensagem': message}), 400
-
-        response, message, dataSet = ManipulacaoDados.tratamentoCSV()
-        if not response:
-            return jsonify({'Mensagem': message}), 400
-        
-        KNN = AlgoritmoKNN(dataSet, num_pca, qtde_recomendacao)
-        response,message = KNN.treinamentoKNN()
-        
-        if response == 400:
-            return jsonify({'Erro': f'Ocorreu um erro: {message}'}), response
-        return jsonify({'Mensagem':'Seu algoritmo foi treinado com sucesso.'}), 200
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500
-
-
-
-@app.route("/recomendacaoItem/<int:CodigoProduto>", methods=['GET'])
-def RecomendacaoItem(CodigoProduto):
-    try:
-        recomendador = AlgoritmoKNN('','','')
-        status, resultado = recomendador.RecomendarProdutosPorCodigo(CodigoProduto)
-        if status == 200:
-            return jsonify({'ProdutosRecomendados': resultado}), 200
-        else:
-            return jsonify({'Erro': resultado}), 400
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500
-
-
-
-
-@app.route("/recomendacaoTodosItens", methods=['GET'])
-def RecomendacaoTodosItens():
-    try:
-        recomendador = AlgoritmoKNN('','','')
-        status, resultado,porcentagem_iguais = recomendador.RecomendarTodosProdutos()
-        if status == 200:
-            return jsonify({'PorcAcertoSecaoDepto':porcentagem_iguais,'ProdutosRecomendados': resultado}), 200
-        else:
-            return jsonify({'Erro': resultado}), 400
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500
-    
-    
-# endregion
   
 @app.route("/gerarModelo", methods=['POST'])
 def GeracaoModelo():
+    """
+    Gerar modelo de recomendação
+    ---
+    tags:
+      - Modelo
+    parameters:
+      - name: JSON
+        in: body
+        required: true
+        schema:
+            type: object
+            properties:
+                NúmeroPCA:
+                    type: integer
+                    required: true
+                    description: Número de componente para normalização de matriz
+                QtdeRecomendação:
+                    required: true
+                    type: integer
+                    description: Quantidade de recomendações por produto
+                IdArquivo:
+                    required: true
+                    type: integer
+                    description: Id do arquivo
+                Versão:
+                    required: true
+                    type: string
+                    description: Versão do modelo treinado
+    responses:
+      200:
+        description: Resultado da geração do modelo
+        schema:
+          type: object
+          properties:
+            Mensagem:
+              type: string
+              description: O resultado da requisição
+      400:
+        description: Erro ao treinar máquina
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição   
+      500:
+        description: Erro inesperado
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição, erro desconhecido.
+    """
     try:
         data = request.get_json(force=True)
         ModeloRep = ModeloRepository(data)
@@ -218,6 +188,38 @@ def GeracaoModelo():
     
 @app.route("/removerModelo/<int:IdModelo>", methods=['DELETE']) #OK
 def RemoverModelo(IdModelo):
+    """
+    Deletar modelo de recomendação
+    ---
+    tags:
+      - Modelo
+    parameters:
+      - name: IdModelo
+        in: path
+        type: integer
+        required: true
+        description: Id do modelo a ser removido
+    responses:
+      204:
+        description: Modelo removido com sucesso
+      404:
+        description: Modelo não encontrado
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: Mensagem de erro
+      500:
+        description: Erro interno do servidor
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: Mensagem de erro
+    """
+
     try:
         ModeloRep = ModeloRepository('')
         response,message = ModeloRep.RemoverModelo(IdModelo)
@@ -228,8 +230,50 @@ def RemoverModelo(IdModelo):
         return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500 
     
     
-@app.route("/recomendarProdutos", methods=['GET']) #OK
+@app.route("/recomendarProdutos", methods=['POST']) #OK
 def RecomendarTodosProdutosModelo():
+    """
+    Recomendar todos os produtos 
+    ---
+    tags:
+      - Recomendação
+    parameters:
+      - name: JSON
+        in: body
+        required: true
+        schema:
+            type: object
+            properties:
+                Id Modelo:
+                    type: integer
+                    required: true
+                    description: Id do modelo utilizado para fazer recomendação
+    responses:
+      200:
+        description: Resultado da recomendação do modelo
+        schema:
+          type: object
+          properties:
+            Dados:
+              type: string
+              description: O resultado da requisição
+      400:
+        description: Erro ao treinar máquina
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição   
+      500:
+        description: Erro inesperado
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição, erro desconhecido.
+    """
     try:
         data = request.get_json(force=True)
         ModeloRep = ModeloRepository(data)
@@ -240,13 +284,60 @@ def RecomendarTodosProdutosModelo():
     except Exception as error:
         return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500    
     
-@app.route("/recomendarProduto", methods=['GET']) #OK
+@app.route("/recomendarProduto", methods=['POST']) #OK
 def RecomendarProdutoReferenciado():
+    """
+    Recomendar produtos similares a um único produto
+    ---
+    tags:
+      - Recomendação
+    parameters:
+      - name: JSON
+        in: body
+        required: true
+        schema:
+            type: object
+            properties:
+                idModelo:
+                    type: integer
+                    required: true
+                    description: Id do modelo utilizado para fazer recomendação
+                CodigoProduto:
+                    type: integer
+                    required: true
+                    description: Código do produto base
+    responses:
+      200:
+        description: Resultado da recomendação do modelo
+        schema:
+          type: object
+          properties:
+            Dados:
+              type: string
+              description: O resultado da requisição
+      400:
+        description: Erro ao treinar máquina
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição   
+      500:
+        description: Erro inesperado
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição, erro desconhecido.
+    """
     try:
         data = request.get_json(force=True)
         ModeloRep = ModeloRepository(data)
         response,message = ModeloRep.RecomendacaoProdutoUnico()
         if response == 400:
+            print(message)
             return jsonify({'Erro': message}), 400
         return jsonify({'Dados':message}), 200
     except Exception as error:
@@ -258,6 +349,58 @@ def RecomendarProdutoReferenciado():
   
 @app.route("/cadastrarDataSet", methods=['POST']) #OK
 def CadastrarDataSet():
+    """
+    Gerar modelo de recomendação
+    ---
+    tags:
+      - Base de produtos
+    parameters:
+      - name: versao
+        in: FormData
+        type: integer
+        required: true
+        description: Versão do dataset
+      - name: idUsuario
+        in: FormData
+        type: integer
+        required: true
+        description: Id do usuário
+      - name: delimiter
+        in: FormData
+        type: integer
+        required: true
+        description: Delimitador para quebrar a linha
+      - name: file
+        in: formData
+        type: file
+        required: true
+        description: Arquivo a ser processado (CSV, JSON)
+    responses:
+      200:
+        description: Resultado do registro do dataset
+        schema:
+          type: object
+          properties:
+            Mensagem:
+              type: string
+              description: O resultado da requisição
+      400:
+        description: Erro ao treinar máquina
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição   
+      500:
+        description: Erro inesperado
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição, erro desconhecido.
+    """
     try:
         ArquivoRepositorio = ArquivoRepository(request)
         response,message = ArquivoRepositorio.RegistrarArquivo()
@@ -269,6 +412,37 @@ def CadastrarDataSet():
     
 @app.route("/removerDataSet/<int:CodigoDataSet>", methods=['DELETE']) #OK
 def RemoverDataSet(CodigoDataSet):
+    """
+    Deletar DataSet de produtos
+    ---
+    tags:
+      - Base de produtos
+    parameters:
+      - name: CodigoDataSet
+        in: path
+        type: integer
+        required: true
+        description: Id do DataSet a ser removido.
+    responses:
+      204:
+        description: DataSet removido com sucesso
+      404:
+        description: DataSet não encontrado
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: Mensagem de erro
+      500:
+        description: Erro interno do servidor
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              description: Mensagem de erro
+    """
     try:
         ArquivoRepositorio = ArquivoRepository(request)
         response,message = ArquivoRepositorio.RemoverArquivo(CodigoDataSet)
@@ -280,18 +454,85 @@ def RemoverDataSet(CodigoDataSet):
     
 @app.route("/listaDataSets", methods=['GET']) #OK
 def ListaDataSets():
+    """
+    Lista de DataSets de produtos
+    ---
+    tags:
+      - Base de produtos
+    responses:
+      200:
+        description: Resultado da recomendação do modelo
+        schema:
+          type: object
+          properties:
+            Dados:
+              type: string
+              description: O resultado da requisição
+      400:
+        description: Erro ao treinar máquina
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição   
+      500:
+        description: Erro inesperado
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição, erro desconhecido.
+    """
     try:
         ArquivoRepositorio = ArquivoRepository(request)
         response,message,data = ArquivoRepositorio.ListarArquivos()
         if response == 400:
             return jsonify({'Erro': message}), 400
         return jsonify({'Mensagem': data}), 200
-    
     except Exception as error:
         return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500   
     
 @app.route("/dataSet/<int:IdDataSet>", methods=['GET']) #OK
 def ListarDataSet(IdDataSet):
+    """
+    Lista de DataSets de produtos específico
+    ---
+    tags:
+      - Base de produtos
+    parameters:
+      - name: IdDataSet
+        in: path
+        type: integer
+        required: true
+        description: Id do DataSet a ser listado
+    responses:
+      200:
+        description: Resultado da listagem de DataSets
+        schema:
+          type: object
+          properties:
+            Dados:
+              type: string
+              description: O resultado da requisição
+      400:
+        description: Erro ao treinar máquina
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição   
+      500:
+        description: Erro inesperado
+        schema:
+          type: object
+          properties:
+            Erro:
+              type: string
+              description: Mensagem de erro da requisição, erro desconhecido.
+    """
     try:
         ArquivoRepositorio = ArquivoRepository(request)
         response,message,data = ArquivoRepositorio.ListarArquivoUnico(IdDataSet)

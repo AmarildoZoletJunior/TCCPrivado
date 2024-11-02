@@ -17,21 +17,22 @@ from src.data.base import Base
 
 class Database:
     def __init__(self):
-        self.engine = self.ConnectDataBase()
+        self.engine = self.ConectarBancoDados()
         if isinstance(self.engine, str):
             print(self.engine)
         else:
-            self.Session = sessionmaker(bind=self.engine)
-            self.VerifyBaseTables()
+            self.Sessao = sessionmaker(bind=self.engine)
+            self.VerificarTabelas()
 
-    def VerifyBaseTables(self):
+    def VerificarTabelas(self):
         try:
             Base.metadata.create_all(self.engine, checkfirst=True)
+            self.AdicionarUsuarioPadrao()
         except Exception as e:
             print(f"Ocorreu um erro ao criar as tabelas do banco, verifique a conexão")
             print(str(e))
 
-    def ConnectDataBase(self):
+    def ConectarBancoDados(self):
         try:
             params = urllib.parse.quote_plus(
                 f"DRIVER={configuration.DRIVER};"
@@ -49,11 +50,11 @@ class Database:
         
         
 
-    def DoSelectWithRelations(self, model, relacoes=None, filtros=None):
+    def SelecionarRegistrosComRelacionamento(self, model, relacoes=None, filtros=None):
         if isinstance(self.engine, str):
             return []
 
-        with self.Session() as session:
+        with self.Sessao() as session:
             query = session.query(model)
             if filtros:
                 query = query.filter_by(**filtros)
@@ -61,38 +62,54 @@ class Database:
                 for relacao in relacoes:
                     query = query.join(relacao)
             results = query.all()
-            dto_list = [self.convert_to_dto(result) for result in results]
+            dto_list = [self.ConverterDTO(result) for result in results]
 
             return dto_list
 
 
-    def DoSelect(self, model, **filters):
+    def SelecionarRegistro(self, model, **filters):
         if isinstance(self.engine, str):
             return []
         try:
-            with self.Session() as session:
+            with self.Sessao() as session:
                 query = session.query(model).filter_by(**filters)
                 results = query.all()
-                dto_list = [self.convert_to_dto(result) for result in results]
+                dto_list = [self.ConverterDTO(result) for result in results]
                 return dto_list
         except Exception as e:
             print(f"Erro ao realizar DoSelect: {e}")
             return []
+        
+    def AdicionarUsuarioPadrao(self):
+        default_user = {
+            'USUsername': 'admin',
+            'USUpassword': 'admin'
+        }
+        
+        with self.Sessao() as session:
+            UsuarioExistente = session.query(Usuarios).filter_by(USUsername=default_user['USUsername']).first()
+            if not UsuarioExistente:
+                NovoUsuario = Usuarios(**default_user)
+                session.add(NovoUsuario)
+                session.commit()
+                print("Usuário padrão adicionado com sucesso!")
+            else:
+                print("Usuário padrão já existe.")
 
-    def objectToDict(self, obj):
+    def ObjetoParaDicionario(self, obj):
         if obj is None:
             return None
         return {column.name: getattr(obj, column.name) for column in obj.__table__.columns}
 
-    def DoInsert(self, model, **data):
+    def Insercao(self, model, **data):
         if isinstance(self.engine, str):
             return None
-        with self.Session() as session:
+        with self.Sessao() as session:
             try:
-                new_record = model(**data)
-                session.add(new_record)
+                NovoRegistro = model(**data)
+                session.add(NovoRegistro)
                 session.commit()
-                return self.objectToDict(new_record)
+                return self.ObjetoParaDicionario(NovoRegistro)
             except Exception as e:
                 session.rollback()
                 print(f"Erro ao inserir dados: {e}")
@@ -102,34 +119,34 @@ class Database:
         if isinstance(self.engine, str):
             return None
         
-        with self.Session() as session:
+        with self.Sessao() as session:
             try:
-                query = session.query(model).filter_by(**filters)
-                updated_count = query.update(update_data, synchronize_session=False)
+                Consulta = session.query(model).filter_by(**filters)
+                QtdeRegistroAtualizado = Consulta.update(update_data, synchronize_session=False)
                 session.commit()
-                return updated_count
+                return QtdeRegistroAtualizado
             except Exception as e:
                 session.rollback()
                 print(f"Erro ao atualizar dados: {e}")
                 return None
             
             
-    def DoDelete(self, model, **filters):
+    def DeletarRegistro(self, model, **filters):
         if isinstance(self.engine, str):
             return None
-        with self.Session() as session:
+        with self.Sessao() as session:
             try:
-                query = session.query(model).filter_by(**filters)
-                deleted_count = query.delete(synchronize_session=False)
+                Consulta = session.query(model).filter_by(**filters)
+                QtdeRegistroDeletado = Consulta.delete(synchronize_session=False)
                 session.commit()
-                return deleted_count
+                return QtdeRegistroDeletado
             except Exception as e:
                 session.rollback()
                 print(f"Erro ao deletar dados: {e}")
                 return None
 
     
-    def convert_to_dto(self, model_instance):
+    def ConverterDTO(self, model_instance):
         if isinstance(model_instance, Arquivos):
             return ArquivoProdutosDTO(
                 id=model_instance.APId,

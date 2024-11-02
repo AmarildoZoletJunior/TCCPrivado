@@ -21,13 +21,13 @@ class UserRepository():
     
     def FindUser(self):
         Data = Database()
-        resultado  = Data.DoSelect(Usuarios,USUsername = self.login,USUpassword = self.password)
+        resultado  = Data.SelecionarRegistro(Usuarios,USUsername = self.login,USUpassword = self.password)
         return resultado
         
         
     def FindUsername(self,login):
         Data = Database()
-        resultado  = Data.DoSelect(Usuarios,USUsername = login)
+        resultado  = Data.SelecionarRegistro(Usuarios,USUsername = login)
         if len(resultado) > 0:
             return True
         else:
@@ -38,10 +38,10 @@ class UserRepository():
         if not response:
             return 400,message
         Data = Database()
-        response = Data.DoSelect(Usuarios,USUsername=self.login)
+        response = Data.SelecionarRegistro(Usuarios,USUsername=self.login)
         if len(response) > 0:
             return 400,'Já existe um usuário com este nome'
-        response = Data.DoInsert(Usuarios,USUsername=self.login,USUpassword=self.password)
+        response = Data.Insercao(Usuarios,USUsername=self.login,USUpassword=self.password)
         if response is None:
             return 400,'Ocorreu um erro ao gravar registro, tente novamente.'
         else:
@@ -97,7 +97,7 @@ class UserRepository():
         
     def FindUserById(self,idUsuario):
         Data = Database()
-        response = Data.DoSelect(Usuarios,USUid=idUsuario)
+        response = Data.SelecionarRegistro(Usuarios,USUid=idUsuario)
         if len(response) > 0:
             return 200,''
         else:

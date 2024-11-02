@@ -2436,7 +2436,17 @@ class ManipulacaoCSV():
             self.DataSet.drop(self.DataSet[self.DataSet['DescricaoProduto'].str.contains(fr'\bS/CART\b',case=False, regex=True) & (self.DataSet['CodDepartamento'] == 1) & (self.DataSet['CodSecao'] == 4)].index, inplace = True)
             self.DataSet['DescricaoProduto'] = self.DataSet['DescricaoProduto'].str.replace(r'\s+', ' ', regex=True)
             self.DataSet['DescricaoProduto'] = self.DataSet['DescricaoProduto'].str.lstrip()
+            self.DataSet['DescricaoProduto'] = self.DataSet['DescricaoProduto'].str.rstrip()
+            self.DataSet['Marca'] = self.DataSet['Marca'].apply(self.processar_marca)
             
+            
+        @staticmethod
+        def processar_marca(marca):
+            if isinstance(marca, str):  # Verifica se é uma string
+                return marca.split(',')[0]
+            return marca  # Retorna o valor original se não for uma string
+
+
         @staticmethod
         def mudarCodMarcaSemRegistro(Data,Palavra,CodMarca,CampoFiltro):
             Data.loc[Data[CampoFiltro].str.contains(fr'\b{Palavra}\b',case=False, regex=True) & (Data['CodMarca'] == 0), 'CodMarca'] = CodMarca

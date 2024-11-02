@@ -135,7 +135,7 @@ class ModeloRepository():
         ModeloByte = self.SerializarObjeto(Modelo)
         
         data = Database()
-        data = data.DoInsert(Modelos,
+        data = data.Insercao(Modelos,
                              MDVersao=versao,MDArquivo=ModeloByte,MDIdArquivoProd=idArquivo,MDArquivoScaler=ScalerByte,MDArquivoEncoder=EncoderByte,
                              MDArquivoPca=PcaByte,MDVetorTF=VetorTFByte,MDNumeroPCA=numPca,MDQtdeRecomendacao=qtdeRecomendacao,MDIdUsuario=idUsuario,MDArquivoProdAlterado = CSVConteudoBinario
                              )
@@ -154,10 +154,10 @@ class ModeloRepository():
         if not isinstance(idModelo,int):
             return 400,'Parâmetro idModelo pode ser apenas do tipo inteiro'
         data = Database()
-        dataModelos = data.DoSelect(Modelos,MDId = idModelo)
+        dataModelos = data.SelecionarRegistro(Modelos,MDId = idModelo)
         if len(dataModelos) == 0:
             return 400,f'Não foi encontrado o registro do modelo, Id: {idModelo}'
-        response = data.DoDelete(Modelos,MDId = idModelo)
+        response = data.DeletarRegistro(Modelos,MDId = idModelo)
         if response is None:
             return 400,f'Não foi possível remover o registro, tente novamente.'
         return 200,''
@@ -298,7 +298,7 @@ class ModeloRepository():
         if not idModelo:
             return 400,'Parâmetro idModelo é obrigatório.',''
         data = Database()
-        dataModelos = data.DoSelect(Modelos,MDId = idModelo)
+        dataModelos = data.SelecionarRegistro(Modelos,MDId = idModelo)
         if len(dataModelos) == 0:
             return 400,f'Não foi encontrado o registro do modelo, Id: {idModelo}',''
         return 200,'',dataModelos
