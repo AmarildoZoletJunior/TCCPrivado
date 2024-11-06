@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
-from src.data.base import Base
 from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
+from src.data.base import Base
+
 
 class Usuarios(Base):
     __tablename__ = 'Usuarios'

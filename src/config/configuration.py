@@ -1,13 +1,11 @@
-from configparser import ConfigParser
 import os
+from configparser import ConfigParser
 
-# Caminho absoluto para o arquivo de configuração
 config_file = r'C:\Users\amjun\Desktop\Catolica\TCC\TCCPrivado\src\config\config.ini'
+# config_file = r'<Letra do Disco>:\<NomeDaPastaDeUsuarios>\<NomeDoUsuario>\Desktop\<NomeDaPasta>\TCCPrivado\src\config\config.ini
 
-# Inicializa o ConfigParser
 conf_obj = ConfigParser()
 
-# Verifica se o arquivo existe
 if os.path.exists(config_file):
     conf_obj.read(config_file)
 else:
@@ -34,6 +32,7 @@ try:
         UrlPastaDataSet = config.get('UrlPastaDataSet', None)
         ip = config.get('ip', None)
         porta = config.get('porta', None)
+        stringGeracaoJWT = config.get('StringCodificacaoJWT',None)
         
         if UrlPastaModelos is None:
             raise ValueError("Chave 'UrlPastaModelos' não encontrada na seção [Parametros].")
@@ -49,6 +48,9 @@ try:
 
         if porta is None:
             raise ValueError("Chave 'porta' não encontrada na seção [Parametros].")
+    
+        if stringGeracaoJWT is None:
+            raise ValueError("Chave 'stringGeracaoJWT' não encontrada na seção [Parametros].")
     else:
         raise ValueError("Seção 'Parametros' não encontrada no arquivo de configuração.")
 

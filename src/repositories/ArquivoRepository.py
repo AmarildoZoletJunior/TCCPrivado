@@ -1,13 +1,15 @@
 import io
-from src.entidades.arquivos import Arquivos
-from src.data.database import Database
+
 import pandas as pd
+
+from src.data.database import Database
+from src.entidades.arquivos import Arquivos
 
 
 class ArquivoRepository():
     def __init__(self,request):
-        self.request = request
-        self.colunasVerificacao = [
+        self.Requisicao = request
+        self.ColunasVerificacao = [
             'codprod',
             'descricaoproduto',
             'embalagem',
@@ -26,90 +28,90 @@ class ArquivoRepository():
         ]
         
         
-    def VerificarArquivo(self,delimiter,idUsuario,versao):
-        if 'file' not in self.request.files:
+    def VerificarArquivo(self,Delimitador,IdUsuario,Versao):
+        if 'file' not in self.Requisicao.files:
             return False,'Nenhum arquivo enviado.'
         
-        arquivo = self.request.files['file']
-        if arquivo.filename == '':
+        Arquivo = self.Requisicao.files['file']
+        if Arquivo.filename == '':
             return False, 'Nenhum nome de arquivo enviado.'
         
-        if not arquivo.filename.endswith('.csv'):
+        if not Arquivo.filename.endswith('.csv'):
             return False,'O arquivo não é CSV.'
         
         
-        if not delimiter:
+        if not Delimitador:
             return False,'Parâmetro delimiter é obrigatório'
         
-        if len(delimiter) == 0:
+        if len(Delimitador) == 0:
             return False,'Parâmetro delimiter é obrigatório'
         
         
-        if not idUsuario:
+        if not IdUsuario:
             return False,'Parâmetro idUsuario é obrigatório'
         
-        if not versao:
+        if not Versao:
             return False,'Parâmetro versao é obrigatório'
         
-        self.file_content  = arquivo.stream.read()
+        self.ArquivoConteudo  = Arquivo.stream.read()
         
         try:
-            self.DataSet = pd.read_csv(io.StringIO(self.file_content.decode('ISO-8859-1')), delimiter=delimiter)
-        except pd.errors.ParserError as e:
+            self.DataSet = pd.read_csv(io.StringIO(self.ArquivoConteudo.decode('ISO-8859-1')), delimiter=Delimitador)
+        except pd.errors.ParserError as Erro:
             return False, f"Erro ao processar o arquivo CSV, verifique o delimitador"
         
         if len(self.DataSet) < 4:
             return False, 'O arquivo não contém os registros mínimos necessários que são 4.'
         
-        colunasDataset = self.DataSet.columns.tolist()
-        colunasFaltantes = [col for col in self.colunasVerificacao if col not in colunasDataset]
-        if colunasFaltantes:
-            return False,f'Existem colunas faltantes no CSV, colunas: {colunasFaltantes}'
+        ColunasDataSet = self.DataSet.columns.tolist()
+        ColunasFaltantes = [col for col in self.ColunasVerificacao if col not in ColunasDataSet]
+        if ColunasFaltantes:
+            return False,f'Existem colunas faltantes no CSV, colunas: {ColunasFaltantes}'
         return True,''
         
     def RegistrarArquivo(self):
-        versao = self.request.form.get('versao')
-        idUsuario = self.request.form.get('idUsuario')
-        delimiter = self.request.form.get('delimiter')
-        response,message = self.VerificarArquivo(delimiter,idUsuario,versao)
+        Versao = self.Requisicao.form.get('versao')
+        IdUsuario = self.Requisicao.form.get('idUsuario')
+        Delimitador = self.Requisicao.form.get('delimiter')
         
-        if not response:
-            return 400,message
+        Resposta,Mensagem = self.VerificarArquivo(Delimitador,IdUsuario,Versao)
+        if not Resposta:
+            return 400,Mensagem
         
-        csv_content_str = self.DataSet.to_csv(index=False, sep=';')
-        csv_content_binary = csv_content_str.encode('ISO-8859-1')
+        ConteudoCSVTexto = self.DataSet.to_csv(index=False, sep=';')
+        ConteudoCSVBinario = ConteudoCSVTexto.encode('ISO-8859-1')
         
-        data = Database()
-        response = data.Insercao(Arquivos,APArquivo = csv_content_binary,APArquivoDelimiter = delimiter,APQtdeProdutos = len(self.DataSet),APIdUsuario = idUsuario,APVersao = versao)
-        if response is None:
+        BaseDados = Database()
+        Resposta = BaseDados.Insercao(Arquivos,APArquivo = ConteudoCSVBinario,APArquivoDelimiter = Delimitador,APQtdeProdutos = len(self.DataSet),APIdUsuario = IdUsuario,APVersao = Versao)
+        if Resposta is None:
             return 400,'Ocorreu um erro ao inserir o registro.'
         return 200,''
     
     
-    def RemoverArquivo(self,idArquivo):
-        if not idArquivo:
+    def RemoverArquivo(self,IdArquivo):
+        if not IdArquivo:
             return 400,'Não foi encontrado o Id do arquivo.'
-        if not isinstance(idArquivo,int):
+        if not isinstance(IdArquivo,int):
             return 400,'o id do arquivo deve ser do tipo inteiro.'
-        dataBase = Database()
-        data = dataBase.SelecionarRegistro(Arquivos,APId = idArquivo)
-        if len(data) == 0:
-            return 400,f'Não foi encontrado o arquivo com o id:{idArquivo}'
-        response = dataBase.DeletarRegistro(Arquivos,APId = idArquivo)
-        if response is None:
+        BaseDados = Database()
+        RegistrosArquivos = BaseDados.SelecionarRegistro(Arquivos,APId = IdArquivo)
+        if len(RegistrosArquivos) == 0:
+            return 400,f'Não foi encontrado o arquivo com o id:{IdArquivo}'
+        Resposta = BaseDados.DeletarRegistro(Arquivos,APId = IdArquivo)
+        if Resposta is None:
             return 400,'Ocorreu um erro ao deletar o registro.'
         return 200,''
         
     def ListarArquivos(self):
-        dataBase = Database()
-        data = dataBase.SelecionarRegistro(Arquivos)
-        if len(data) == 0:
+        BaseDados = Database()
+        RegistrosArquivos = BaseDados.SelecionarRegistro(Arquivos)
+        if len(RegistrosArquivos) == 0:
             return 400,f'Não foi encontrado nenhum arquivo.',''
-        return 200,'',data
+        return 200,'',RegistrosArquivos
     
     def ListarArquivoUnico(self,idArquivo):
-        dataBase = Database()
-        data = dataBase.SelecionarRegistro(Arquivos,APId = idArquivo)
-        if len(data) == 0:
+        BaseDados = Database()
+        RegistrosArquivos = BaseDados.SelecionarRegistro(Arquivos,APId = idArquivo)
+        if len(RegistrosArquivos) == 0:
             return 400,f'Não foi encontrado nenhum arquivo.',''
-        return 200,'',data
+        return 200,'',RegistrosArquivos

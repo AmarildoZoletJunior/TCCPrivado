@@ -1,19 +1,18 @@
 
-from src.dtos.arquivosDTO import ArquivoProdutosDTO
-from src.dtos.modelosDTO import ModelosDTO
-from src.dtos.usuariosDTO import UsuariosDTO
-from sqlalchemy import create_engine, MetaData
+import urllib
+
+from sqlalchemy import MetaData, create_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.config import configuration
-import urllib
-
-from src.entidades.usuarios import Usuarios
-from src.entidades.modelos import Modelos
-from src.entidades.arquivos import Arquivos
-
-
 from src.data.base import Base
+from src.dtos.arquivosDTO import ArquivoProdutosDTO
+from src.dtos.modelosDTO import ModelosDTO
+from src.dtos.usuariosDTO import UsuariosDTO
+from src.entidades.arquivos import Arquivos
+from src.entidades.modelos import Modelos
+from src.entidades.usuarios import Usuarios
+
 
 class Database:
     def __init__(self):

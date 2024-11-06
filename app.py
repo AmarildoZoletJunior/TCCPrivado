@@ -1,121 +1,119 @@
+import datetime
 import io
+from functools import wraps
+
+import jwt
 import pandas as pd
+from flasgger import Swagger
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+
+from src.config import configuration
 from src.data.database import Database
-from flask import Flask, request, jsonify
 from src.repositories.ArquivoRepository import ArquivoRepository
 from src.repositories.ModeloRepository import ModeloRepository
 from src.repositories.UsuarioRepository import UserRepository
-from src.config import  configuration
-import jwt
-from functools import wraps
-import datetime
-from flask_cors import CORS 
-
-from flasgger import Swagger
-
-
-
 
 data = Database()
 app = Flask(__name__)
 swagger = Swagger(app)
 CORS(app)
 
-secret = '1111'
+secret = configuration.stringGeracaoJWT
 
 # region Usuario
-@app.route("/welcome",methods=['GET'])
+@app.route("/",methods=['GET'])
 def Inicial():
-    print("Teste")
+    return jsonify({'Mensagem':'Seja bem vindo a API de recomendação de produtos'}), 200
     
 def tokenNecessario(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = None
+        Token = None
         if 'Authorization' in request.headers:
-            auth_header = request.headers['Authorization']
-            if auth_header.startswith("Bearer "):
-                token = auth_header.split(" ")[1]
+            CabecalhoAutenticacao = request.headers['Authorization']
+            if CabecalhoAutenticacao.startswith("Bearer "):
+                Token = CabecalhoAutenticacao.split(" ")[1]
             else:
                 return jsonify({'Erro': 'Formato do token inválido!'}), 401
         else:
             return jsonify({'Erro': 'Token é necessário!'}), 401
 
         try:
-            data = jwt.decode(token, secret, algorithms=["HS256"])
-            current_user = data['user_id']
+            Dados = jwt.decode(Token, secret, algorithms=["HS256"])
+            UsuarioAtual = Dados['user_id']
         except jwt.ExpiredSignatureError:
             return jsonify({'Erro': 'Token expirado!'}), 401
         except jwt.InvalidTokenError:
             return jsonify({'Erro': 'Token inválido!'}), 401
 
-        return f(current_user, *args, **kwargs)
+        return f(UsuarioAtual, *args, **kwargs)
 
     return decorated
 
 def criarTokenJWT(user_id):
-    token = jwt.encode({
+    Token = jwt.encode({
         'user_id': user_id,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
     }, app.config['SECRET_KEY'], algorithm="HS256")
-    return token
+    return Token
 
 
 
 @app.route("/login",methods=['POST'])
-def SignInAccount():
+def EntrarNaConta():
     try:
-        data = request.get_json(force=True)
-        UserRep = UserRepository(data)
-        response, message = UserRep.ValidUser()
-        if not response:
-            return jsonify({'Erro': message}), 400
-        user_list = UserRep.FindUser()
+        Dados = request.get_json(force=True)
+        UserRep = UserRepository(Dados)
+        Resposta, Mensagem = UserRep.ValidUser()
+        if not Resposta:
+            return jsonify({'Erro': Mensagem}), 400
+        ListaUsuario = UserRep.FindUser()
 
-        if user_list and isinstance(user_list, list) and len(user_list) > 0:
-            user = user_list[0]
-            user_id = user.get('USUid')
-            token = criarTokenJWT(user_id)
+        if ListaUsuario and isinstance(ListaUsuario, list) and len(ListaUsuario) > 0:
+            Usuario = ListaUsuario[0]
+            IdUsuario = Usuario.get('USUid')
+            Token = criarTokenJWT(IdUsuario)
 
             return jsonify({
                 'Mensagem': 'Usuário encontrado com sucesso',
-                'token': token
+                'token': Token
             }), 200
         else:
             return jsonify({'Erro': 'Usuário não encontrado'}), 400
 
-    except Exception as e:
-        return jsonify({'Erro': f'Ocorreu um erro: {e}'}), 500
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500
     
     
     
     
 @app.route("/criar/usuario",methods=['POST'])
-def RegisterAccount():
+def RegistrarConta():
     try:
-        data = request.get_json(force=True)
-        UserRep = UserRepository(data)
-        response,message = UserRep.CreateUser()
-        if response == 400:
-            return jsonify({'Erro': message}), 400
+        Dados = request.get_json(force=True)
+        UserRep = UserRepository(Dados)
+        Resposta,Mensagem = UserRep.CreateUser()
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
         else:
             return jsonify({'Mensagem': f'Usuário cadastrado com sucesso'}), 200
-    except Exception as e:
-        return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro, erro: {Erro}'}), 500
     
     
 @app.route("/atualizar/senha",methods=['PUT'])
-def ResetPassword():
+def ResetSenha():
     try:
-        data = request.get_json(force=True)
-        UserRep = UserRepository(data)
-        response,message = UserRep.ResetPassword()
-        if response == 400:
-            return jsonify({'Erro': message}), 400
+        Dados = request.get_json(force=True)
+        UserRep = UserRepository(Dados)
+        Resposta,Mensagem = UserRep.ResetPassword()
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
         else:
             return jsonify({'Mensagem': f'Usuário cadastrado com sucesso'}), 200
-    except Exception as e:
-        return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro, erro: {Erro}'}), 500
         
 # endregion                 
   
@@ -176,14 +174,14 @@ def GeracaoModelo():
               description: Mensagem de erro da requisição, erro desconhecido.
     """
     try:
-        data = request.get_json(force=True)
-        ModeloRep = ModeloRepository(data)
-        response,message = ModeloRep.CriarModelo()
-        if response == 400:
-            return jsonify({'Erro': message}), 400
+        Dados = request.get_json(force=True)
+        ModeloRep = ModeloRepository(Dados)
+        Resposta,Mensagem = ModeloRep.CriarModelo()
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
         return jsonify({'Mensagem':'Seu modelo foi gerado com sucesso.'}), 200
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500 
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500 
     
     
 @app.route("/removerModelo/<int:IdModelo>", methods=['DELETE']) #OK
@@ -222,12 +220,12 @@ def RemoverModelo(IdModelo):
 
     try:
         ModeloRep = ModeloRepository('')
-        response,message = ModeloRep.RemoverModelo(IdModelo)
-        if response == 400:
-            return jsonify({'Erro': message}), 400
+        Resposta,Mensagem = ModeloRep.RemoverModelo(IdModelo)
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
         return jsonify({'Mensagem':'Seu modelo foi gerado com sucesso.'}), 200
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500 
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500 
     
     
 @app.route("/recomendarProdutos", methods=['POST']) #OK
@@ -277,12 +275,12 @@ def RecomendarTodosProdutosModelo():
     try:
         data = request.get_json(force=True)
         ModeloRep = ModeloRepository(data)
-        response,message = ModeloRep.RecomendacaoProdutosTotal()
-        if response == 400:
-            return jsonify({'Erro': message}), 400
-        return jsonify({'Dados':message}), 200
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500    
+        Resposta,Mensagem = ModeloRep.RecomendacaoProdutosTotal()
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
+        return jsonify({'Dados':Mensagem}), 200
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500    
     
 @app.route("/recomendarProduto", methods=['POST']) #OK
 def RecomendarProdutoReferenciado():
@@ -333,15 +331,15 @@ def RecomendarProdutoReferenciado():
               description: Mensagem de erro da requisição, erro desconhecido.
     """
     try:
-        data = request.get_json(force=True)
-        ModeloRep = ModeloRepository(data)
-        response,message = ModeloRep.RecomendacaoProdutoUnico()
-        if response == 400:
-            print(message)
-            return jsonify({'Erro': message}), 400
-        return jsonify({'Dados':message}), 200
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500    
+        Dado = request.get_json(force=True)
+        ModeloRep = ModeloRepository(Dado)
+        Resposta,Mensagem = ModeloRep.RecomendacaoProdutoUnico()
+        if Resposta == 400:
+            print(Mensagem)
+            return jsonify({'Erro': Mensagem}), 400
+        return jsonify({'Dados':Mensagem}), 200
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500    
     
 
   
@@ -403,12 +401,12 @@ def CadastrarDataSet():
     """
     try:
         ArquivoRepositorio = ArquivoRepository(request)
-        response,message = ArquivoRepositorio.RegistrarArquivo()
-        if response == 400:
-            return jsonify({'Erro': message}), 400
+        Resposta,Mensagem = ArquivoRepositorio.RegistrarArquivo()
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
         return jsonify({'Mensagem': 'Registro cadastrado com sucesso.'}), 200
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500   
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
 @app.route("/removerDataSet/<int:CodigoDataSet>", methods=['DELETE']) #OK
 def RemoverDataSet(CodigoDataSet):
@@ -444,13 +442,13 @@ def RemoverDataSet(CodigoDataSet):
               description: Mensagem de erro
     """
     try:
-        ArquivoRepositorio = ArquivoRepository(request)
-        response,message = ArquivoRepositorio.RemoverArquivo(CodigoDataSet)
-        if response == 400:
-            return jsonify({'Erro': message}), 400
+        ArquivosRep = ArquivoRepository(request)
+        Resposta,Mensagem = ArquivosRep.RemoverArquivo(CodigoDataSet)
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
         return jsonify({'Mensagem': 'Registro removido com sucesso.'}), 200
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500   
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
 @app.route("/listaDataSets", methods=['GET']) #OK
 def ListaDataSets():
@@ -486,13 +484,13 @@ def ListaDataSets():
               description: Mensagem de erro da requisição, erro desconhecido.
     """
     try:
-        ArquivoRepositorio = ArquivoRepository(request)
-        response,message,data = ArquivoRepositorio.ListarArquivos()
-        if response == 400:
-            return jsonify({'Erro': message}), 400
-        return jsonify({'Mensagem': data}), 200
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500   
+        ArquivoRep = ArquivoRepository(request)
+        Resposta,Mensagem,DadosRetorno = ArquivoRep.ListarArquivos()
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
+        return jsonify({'Mensagem': DadosRetorno}), 200
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
 @app.route("/dataSet/<int:IdDataSet>", methods=['GET']) #OK
 def ListarDataSet(IdDataSet):
@@ -534,13 +532,13 @@ def ListarDataSet(IdDataSet):
               description: Mensagem de erro da requisição, erro desconhecido.
     """
     try:
-        ArquivoRepositorio = ArquivoRepository(request)
-        response,message,data = ArquivoRepositorio.ListarArquivoUnico(IdDataSet)
-        if response == 400:
-            return jsonify({'Erro': message}), 400
-        return jsonify({'Mensagem': data}), 200
-    except Exception as error:
-        return jsonify({'Erro': f'Ocorreu um erro: {error}'}), 500   
+        ArquivoRep = ArquivoRepository(request)
+        Resposta,Mensagem,DadosRetorno = ArquivoRep.ListarArquivoUnico(IdDataSet)
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
+        return jsonify({'Mensagem': DadosRetorno}), 200
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
 if __name__ == '__main__':
     app.run(host=configuration.ip, port=configuration.porta)

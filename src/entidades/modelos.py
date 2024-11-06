@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, LargeBinary
+from sqlalchemy import Column, Date, ForeignKey, Integer, LargeBinary, String
 from sqlalchemy.orm import relationship
+
 from src.data.base import Base
 
 

@@ -1,4 +1,5 @@
 import re
+
 from src.data.database import Database
 from src.entidades.usuarios import Usuarios
 

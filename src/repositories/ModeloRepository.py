@@ -1,112 +1,112 @@
 
-
-
 import base64
 import io
+
 import joblib
 import numpy as np
 import pandas as pd
 
+from sklearn.decomposition import PCA
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+from src.data.database import Database
 from src.entidades.modelos import Modelos
 from src.entidades.tratamentoDados import ManipulacaoCSV
-from src.repositories.UsuarioRepository import UserRepository
 from src.repositories.ArquivoRepository import ArquivoRepository
-from src.data.database import Database
+from src.repositories.UsuarioRepository import UserRepository
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.neighbors import NearestNeighbors
 
 class ModeloRepository():
     def __init__(self,request):
-        self.request = request  
+        self.Requisicao = request  
         
-    def ValidarInformacoes(self,idArquivo,versao,idUsuario,numPca,qtdeRecomendacao):
+    def ValidarInformacoes(self,IdArquivo,Versao,IdUsuario,NumPca,QtdeRecomendacao):
         
-        if not idArquivo:
+        if not IdArquivo:
              return False,'Parâmetro idArquivo é obrigatório.'      
-              
-        if not versao:
-            return False,'Parâmetro versao é obrigatório.'
             
-        if not idUsuario:
-            return False,'Parâmetro idUsuario é obrigatório.'
+        if not IdUsuario:
+              return False,'Parâmetro IdUsuario é obrigatório.'      
+          
+        if not Versao:
+            return False,'Parâmetro versao é obrigatório.'
         
-        if not numPca:
+        if not NumPca:
             return False,'Parâmetro numPca é obrigatório.'
 
-        if not qtdeRecomendacao:
+        if not QtdeRecomendacao:
             return False,'Parâmetro qtdeRecomendacao é obrigatório.'
         
-        if not isinstance(qtdeRecomendacao,int):
+        if not isinstance(QtdeRecomendacao,int):
             return False,'Parâmetro qtdeRecomendacao pode ser apenas do tipo inteiro'
         
-        if not isinstance(numPca,int):
+        if not isinstance(NumPca,int):
             return False,'Parâmetro numPca pode ser apenas do tipo inteiro'
         
-        if not isinstance(idUsuario,int):
+        if not isinstance(IdUsuario,int):
             return False,'Parâmetro idUsuario pode ser apenas do tipo inteiro'
         
-        if not isinstance(versao,str):
+        if not isinstance(Versao,str):
             return False,'Parâmetro versao pode ser apenas texto.'
         
-        if not isinstance(idArquivo,int):
+        if not isinstance(IdArquivo,int):
             return False,'Parâmetro idArquivo pode ser apenas do tipo inteiro'
         
         return True,''
         
         
     def CriarModelo(self):
-        idArquivo = self.request.get('idArquivo')
-        versao = self.request.get('versao')
-        idUsuario = self.request.get('idUsuario')
-        numPca = self.request.get('numPca')
-        qtdeRecomendacao = self.request.get('qtdeRecomendacao')
+        IdArquivo = self.Requisicao.get('idArquivo')
+        Versao = self.Requisicao.get('versao')
+        IdUsuario = self.Requisicao.get('idUsuario')
+        NumPca = self.Requisicao.get('numPca')
+        QtdeRecomendacao = self.Requisicao.get('qtdeRecomendacao')
         
         
-        response,message = self.ValidarInformacoes(idArquivo,versao,idUsuario,numPca,qtdeRecomendacao)
-        if not response:
-            return 400,message
+        Resposta,Mensagem = self.ValidarInformacoes(IdArquivo,Versao,IdUsuario,NumPca,QtdeRecomendacao)
+        if not Resposta:
+            return 400,Mensagem
         
-        arquivoRepository = ArquivoRepository('')
-        response,message,data = arquivoRepository.ListarArquivoUnico(idArquivo)
-        if response == 400:
-            return response,message
+        ArquivoRep = ArquivoRepository('')
+        Resposta,Mensagem,data = ArquivoRep.ListarArquivoUnico(IdArquivo)
+        if Resposta == 400:
+            return Resposta,Mensagem
         
-        usuarioRepository = UserRepository('')
-        response,message = usuarioRepository.FindUserById(idUsuario)
-        if response == 400:
-            return response,message
+        UsuarioRep = UserRepository('')
+        Resposta,Mensagem = UsuarioRep.FindUserById(IdUsuario)
+        if Resposta == 400:
+            return Resposta,Mensagem
         CsvConteudoBinario = data[0]['arquivo']
-        delimiter = data[0]['delimiter']
+        Delimitador = data[0]['delimiter']
         CsvConteudoBytes = base64.b64decode(CsvConteudoBinario)
         ConteudoCSVTexto = CsvConteudoBytes.decode('ISO-8859-1')
-        DataSet = pd.read_csv(io.StringIO(ConteudoCSVTexto), delimiter=delimiter)
+        DataSet = pd.read_csv(io.StringIO(ConteudoCSVTexto), delimiter=Delimitador)
         
         ManipulacaoDados = ManipulacaoCSV(DataSet)
-        response, message = ManipulacaoDados.validarDadosCSV()
-        if not response:
-            return 400, message
+        Resposta, Mensagem = ManipulacaoDados.validarDadosCSV()
+        if not Resposta:
+            return 400, Mensagem
 
-        response, message, dataSetTratado = ManipulacaoDados.tratamentoCSV()
-        if not response:
-            return 400,message
+        Resposta, Mensagem, dataSetTratado = ManipulacaoDados.tratamentoCSV()
+        if not Resposta:
+            return 400,Mensagem
         
         
         if len(dataSetTratado) < 4:
             return 400,'Não foi possível treinar um modelo pois a quantidade de registros é menor que 4.'
         
-        if len(dataSetTratado) < numPca:
+        if len(dataSetTratado) < NumPca:
             return 400,'Não foi possível treinar um modelo pois o numPca é superior a quantidade de registros.'
         
-        if len(dataSetTratado) < qtdeRecomendacao:
+        if len(dataSetTratado) < QtdeRecomendacao:
             return 400,'Não foi possível treinar um modelo pois o qtdeRecomendacao é superior a quantidade de registros.'
         
         VetorTF = TfidfVectorizer()
         VetorTFMatrix = VetorTF.fit_transform(dataSetTratado['DescricaoProduto'])
 
-        pca = PCA(n_components=numPca)
+        pca = PCA(n_components=NumPca)
         TFReduzido = pca.fit_transform(VetorTFMatrix.toarray())
         
         VariaveisNumericas = dataSetTratado[['PesoEmbalagemUnitaria', 'QtdeEmbalagem']]
@@ -122,7 +122,7 @@ class ModeloRepository():
         
         FeaturesCombinadas = np.hstack([TFReduzido, EncoderCategorico, VariveisBalanceadas])
 
-        Modelo = NearestNeighbors(n_neighbors=qtdeRecomendacao + 1, metric='nan_euclidean') 
+        Modelo = NearestNeighbors(n_neighbors=QtdeRecomendacao + 1, metric='nan_euclidean') 
         Modelo.fit(FeaturesCombinadas)
         
         CSVConteudoString = dataSetTratado.to_csv(index=False, sep=';')
@@ -136,35 +136,35 @@ class ModeloRepository():
         
         data = Database()
         data = data.Insercao(Modelos,
-                             MDVersao=versao,MDArquivo=ModeloByte,MDIdArquivoProd=idArquivo,MDArquivoScaler=ScalerByte,MDArquivoEncoder=EncoderByte,
-                             MDArquivoPca=PcaByte,MDVetorTF=VetorTFByte,MDNumeroPCA=numPca,MDQtdeRecomendacao=qtdeRecomendacao,MDIdUsuario=idUsuario,MDArquivoProdAlterado = CSVConteudoBinario
+                             MDVersao=Versao,MDArquivo=ModeloByte,MDIdArquivoProd=IdArquivo,MDArquivoScaler=ScalerByte,MDArquivoEncoder=EncoderByte,
+                             MDArquivoPca=PcaByte,MDVetorTF=VetorTFByte,MDNumeroPCA=NumPca,MDQtdeRecomendacao=QtdeRecomendacao,MDIdUsuario=IdUsuario,MDArquivoProdAlterado = CSVConteudoBinario
                              )
         return 200,''
     
-    def SerializarObjeto(self,obj):
-        buffer = io.BytesIO()
-        joblib.dump(obj, buffer)
-        buffer.seek(0)
-        return buffer.read()
+    def SerializarObjeto(self,Objeto):
+        Buffer = io.BytesIO()
+        joblib.dump(Objeto, Buffer)
+        Buffer.seek(0)
+        return Buffer.read()
     
-    def RemoverModelo(self,idModelo):
-        if not idModelo:
+    def RemoverModelo(self,IdModelo):
+        if not IdModelo:
             return 400,'Parâmetro idModelo é obrigatório.'
         
-        if not isinstance(idModelo,int):
+        if not isinstance(IdModelo,int):
             return 400,'Parâmetro idModelo pode ser apenas do tipo inteiro'
-        data = Database()
-        dataModelos = data.SelecionarRegistro(Modelos,MDId = idModelo)
-        if len(dataModelos) == 0:
-            return 400,f'Não foi encontrado o registro do modelo, Id: {idModelo}'
-        response = data.DeletarRegistro(Modelos,MDId = idModelo)
-        if response is None:
+        BaseDados = Database()
+        RegistrosModelos = BaseDados.SelecionarRegistro(Modelos,MDId = IdModelo)
+        if len(RegistrosModelos) == 0:
+            return 400,f'Não foi encontrado o registro do modelo, Id: {IdModelo}'
+        Resposta = BaseDados.DeletarRegistro(Modelos,MDId = IdModelo)
+        if Resposta is None:
             return 400,f'Não foi possível remover o registro, tente novamente.'
         return 200,''
         
     def RecomendacaoProdutoUnico(self):       
-        idModelo = self.request.get('idModelo')
-        CodigoProdutoBase = self.request.get('codigoProduto')
+        IdModelo = self.Requisicao.get('idModelo')
+        CodigoProdutoBase = self.Requisicao.get('codigoProduto')
         if not CodigoProdutoBase:
             return 400,'Parâmetro codigoProduto é obrigatório.'
         
@@ -172,78 +172,78 @@ class ModeloRepository():
             return 400,'Parâmetro codigoProduto deve ser do tipo inteiro.'
         
                 
-        if not idModelo:
+        if not IdModelo:
             return 400,'Parâmetro idModelo é obrigatório.'
         
-        if not isinstance(idModelo,int):
+        if not isinstance(IdModelo,int):
             return 400,'Parâmetro idModelo deve ser do tipo inteiro.' 
         
-        response,message,dataModelo = self.BuscarModeloPorId(idModelo)
-        if response == 400:
-            return response,message
+        Resposta,Mensagem,ResultadoModelos = self.BuscarModeloPorId(IdModelo)
+        if Resposta == 400:
+            return Resposta,Mensagem
     
         
-        self.Modelo = joblib.load(io.BytesIO(dataModelo[0]['arquivo']))
+        self.Modelo = joblib.load(io.BytesIO(ResultadoModelos[0]['arquivo']))
 
-        self.TfidfVectorizer = joblib.load(io.BytesIO(dataModelo[0]['vetor_tf']))
+        self.TfidfVectorizer = joblib.load(io.BytesIO(ResultadoModelos[0]['vetor_tf']))
 
-        self.pca = joblib.load(io.BytesIO(dataModelo[0]['pca']))
+        self.Pca = joblib.load(io.BytesIO(ResultadoModelos[0]['pca']))
 
-        self.Scaler = joblib.load(io.BytesIO(dataModelo[0]['scaler']))
+        self.Scaler = joblib.load(io.BytesIO(ResultadoModelos[0]['scaler']))
 
-        self.Encoder = joblib.load(io.BytesIO(dataModelo[0]['encoder']))
+        self.Encoder = joblib.load(io.BytesIO(ResultadoModelos[0]['encoder']))
         
-        CSVString = io.BytesIO(dataModelo[0]['arquivo_produtos_alterados'])
+        CSVTexto = io.BytesIO(ResultadoModelos[0]['arquivo_produtos_alterados'])
         
-        self.DataSet = pd.read_csv(CSVString, delimiter=';', encoding='ISO-8859-1')
+        self.DataSet = pd.read_csv(CSVTexto, delimiter=';', encoding='ISO-8859-1')
 
         
-        produto = self.DataSet[self.DataSet['CodigoProduto'] == CodigoProdutoBase]
-        if produto.empty:
+        ConteudoProduto = self.DataSet[self.DataSet['CodigoProduto'] == CodigoProdutoBase]
+        if ConteudoProduto.empty:
             return 400, f"Produto com código {CodigoProdutoBase} não encontrado."
         
-        descricao = produto['DescricaoProduto'].values[0]
-        peso_embalagem = produto['PesoEmbalagemUnitaria'].values[0]
-        qtde_embalagem = produto['QtdeEmbalagem'].values[0]
-        cod_departamento = produto['CodDepartamento'].values[0]
-        cod_secao = produto['CodSecao'].values[0]
+        DescricaoProdutoBase = ConteudoProduto['DescricaoProduto'].values[0]
+        PesoEmbalagemProdutoBase = ConteudoProduto['PesoEmbalagemUnitaria'].values[0]
+        QtdeEmbalagemProdutoBase = ConteudoProduto['QtdeEmbalagem'].values[0]
+        CodDepartamentoProdutoBase = ConteudoProduto['CodDepartamento'].values[0]
+        CodSecaoProdutoBase = ConteudoProduto['CodSecao'].values[0]
         
-        tfidf_matrix = self.TfidfVectorizer.transform([descricao])
-        tfidf_reduced = self.pca.transform(tfidf_matrix.toarray())
+        MatrizTfID = self.TfidfVectorizer.transform([DescricaoProdutoBase])
+        TfIDReduzida = self.Pca.transform(MatrizTfID.toarray())
         
-        variaveis_numericas = pd.DataFrame([[peso_embalagem, qtde_embalagem]], columns=['PesoEmbalagemUnitaria', 'QtdeEmbalagem'])
-        variaveis_numericas_escaladas = self.Scaler.transform(variaveis_numericas) * np.array([5, 8])
+        VariaveisNumericas = pd.DataFrame([[PesoEmbalagemProdutoBase, QtdeEmbalagemProdutoBase]], columns=['PesoEmbalagemUnitaria', 'QtdeEmbalagem'])
+        VariaveisNumericasEscaladas = self.Scaler.transform(VariaveisNumericas) * np.array([5, 8])
         
-        variaveis_categoricas = pd.DataFrame([[cod_departamento, cod_secao]], columns=['CodDepartamento', 'CodSecao'])
-        variaveis_categoricas_codificadas = self.Encoder.transform(variaveis_categoricas)
+        VariaveisCategoricas = pd.DataFrame([[CodDepartamentoProdutoBase, CodSecaoProdutoBase]], columns=['CodDepartamento', 'CodSecao'])
+        VariaveisCategoricasCodificadas = self.Encoder.transform(VariaveisCategoricas)
         
-        features_produto = np.hstack([tfidf_reduced, variaveis_categoricas_codificadas, variaveis_numericas_escaladas])
+        VariaveisProdutosArray = np.hstack([TfIDReduzida, VariaveisCategoricasCodificadas, VariaveisNumericasEscaladas])
         
-        distancias, indices = self.Modelo.kneighbors(features_produto)
+        Distancias, Indicas = self.Modelo.kneighbors(VariaveisProdutosArray)
         
-        informacoes_produto_base = {
+        InformacoesProdutoBaseJson = {
             "CodigoProduto": CodigoProdutoBase,
-            "Descricao": produto['DescricaoProduto'].values[0],
-            "PesoUnitario": float(produto['PesoEmbalagemUnitaria'].values[0]),
-            "QtdeEmbalagem": int(produto['QtdeEmbalagem'].values[0]),
-            "Secao": produto['DescricaoSecao'].values[0],
-            "Departamento": produto['DescricaoDepartamento'].values[0],
-            "Marca": produto['Marca'].values[0]
+            "Descricao": ConteudoProduto['DescricaoProduto'].values[0],
+            "PesoUnitario": float(ConteudoProduto['PesoEmbalagemUnitaria'].values[0]),
+            "QtdeEmbalagem": int(ConteudoProduto['QtdeEmbalagem'].values[0]),
+            "Secao": ConteudoProduto['DescricaoSecao'].values[0],
+            "Departamento": ConteudoProduto['DescricaoDepartamento'].values[0],
+            "Marca": ConteudoProduto['Marca'].values[0]
         }
         
-        produtosInformacoesLista = []
-        produtos_recomendados = self.DataSet.iloc[indices[0]]['CodigoProduto'].tolist()
+        ListaInformacoesProduto = []
+        ProdutosRecomendados = self.DataSet.iloc[Indicas[0]]['CodigoProduto'].tolist()
 
-        iguais_departamento_secao = 0  
-        iguais_qtde_embalagem = 0
-        iguais_peso_unitario = 0
+        ContagemDepartamentoESecao = 0  
+        ContagemQtdeEmbalagem = 0
+        QtdePesoUnitario = 0
 
-        margem_relativa = 0.10 * float(produto['PesoEmbalagemUnitaria'].values[0])  
-        peso_unitario_minimo = float(produto['PesoEmbalagemUnitaria'].values[0]) - margem_relativa
-        peso_unitario_maximo = float(produto['PesoEmbalagemUnitaria'].values[0]) + margem_relativa
+        MargemRelativa = 0.10 * float(ConteudoProduto['PesoEmbalagemUnitaria'].values[0])  
+        PesoUnitarioMinimo = float(ConteudoProduto['PesoEmbalagemUnitaria'].values[0]) - MargemRelativa
+        PesoUnitarioMaximo = float(ConteudoProduto['PesoEmbalagemUnitaria'].values[0]) + MargemRelativa
 
-        for i, CodigoProdutoRecomendado in enumerate(produtos_recomendados):
-            if CodigoProdutoRecomendado != CodigoProdutoBase and distancias[0][i] < 0.92:
+        for Index, CodigoProdutoRecomendado in enumerate(ProdutosRecomendados):
+            if CodigoProdutoRecomendado != CodigoProdutoBase and Distancias[0][Index] < 0.92:
                 produtoRecomendado = self.DataSet[self.DataSet['CodigoProduto'] == CodigoProdutoRecomendado]
                 if len(produtoRecomendado) > 0:
                     informacoesProduto = {
@@ -255,36 +255,36 @@ class ModeloRepository():
                         "Departamento": produtoRecomendado['DescricaoDepartamento'].values[0],
                         "Marca": produtoRecomendado['Marca'].values[0]
                     }
-                    produtosInformacoesLista.append(informacoesProduto)
+                    ListaInformacoesProduto.append(informacoesProduto)
 
-                    if (produtoRecomendado['CodDepartamento'].values[0] == cod_departamento and 
-                        produtoRecomendado['CodSecao'].values[0] == cod_secao):
-                        iguais_departamento_secao += 1
+                    if (produtoRecomendado['CodDepartamento'].values[0] == CodDepartamentoProdutoBase and 
+                        produtoRecomendado['CodSecao'].values[0] == CodSecaoProdutoBase):
+                        ContagemDepartamentoESecao += 1
                     
                     peso_unitario_recomendado = float(produtoRecomendado['PesoEmbalagemUnitaria'].values[0])
-                    if peso_unitario_minimo <= peso_unitario_recomendado <= peso_unitario_maximo:
-                        iguais_peso_unitario += 1
-                    if produtoRecomendado['QtdeEmbalagem'].values[0] == qtde_embalagem:
-                        iguais_qtde_embalagem += 1
+                    if PesoUnitarioMinimo <= peso_unitario_recomendado <= PesoUnitarioMaximo:
+                        QtdePesoUnitario += 1
+                    if produtoRecomendado['QtdeEmbalagem'].values[0] == QtdeEmbalagemProdutoBase:
+                        ContagemQtdeEmbalagem += 1
 
-        total_recomendados = len(produtosInformacoesLista)
+        TotalRecomendados = len(ListaInformacoesProduto)
         
-        if total_recomendados > 0:
-            porcentagem_iguais_departamento_secao = (iguais_departamento_secao / total_recomendados) * 100
-            porcentagem_iguais_qtde_embalagem = (iguais_qtde_embalagem / total_recomendados) * 100
-            porcentagem_iguais_peso_unitario = (iguais_peso_unitario / total_recomendados) * 100
+        if TotalRecomendados > 0:
+            PorcentagemDepartamentoSecaoIguais = (ContagemDepartamentoESecao / TotalRecomendados) * 100
+            PorcentagemQtdeEmbalagemIguais = (ContagemQtdeEmbalagem / TotalRecomendados) * 100
+            ProcentagemPesoUnitarioSemelhantes = (QtdePesoUnitario / TotalRecomendados) * 100
         else:
-            porcentagem_iguais_departamento_secao = 0.0
-            porcentagem_iguais_qtde_embalagem = 0.0
-            porcentagem_iguais_peso_unitario = 0.0
+            PorcentagemDepartamentoSecaoIguais = 0.0
+            PorcentagemQtdeEmbalagemIguais = 0.0
+            ProcentagemPesoUnitarioSemelhantes = 0.0
 
-        if total_recomendados > 0:
+        if TotalRecomendados > 0:
             return 200, {
-                "ProdutoBase": informacoes_produto_base,
-                "Recomendacoes": produtosInformacoesLista,
-                "PorcentagemAcertoDepartamentoESecao": porcentagem_iguais_departamento_secao,
-                "PorcentagemAcertoQtdeEmbalagem": porcentagem_iguais_qtde_embalagem,
-                "PorcentagemPesoUnitarioAproximado": porcentagem_iguais_peso_unitario
+                "ProdutoBase": InformacoesProdutoBaseJson,
+                "Recomendacoes": ListaInformacoesProduto,
+                "PorcentagemAcertoDepartamentoESecao": PorcentagemDepartamentoSecaoIguais,
+                "PorcentagemAcertoQtdeEmbalagem": PorcentagemQtdeEmbalagemIguais,
+                "PorcentagemPesoUnitarioAproximado": ProcentagemPesoUnitarioSemelhantes
             }
         else:
             return 400, 'Não foi encontrado nenhum produto similar ao item selecionado.'
@@ -297,130 +297,130 @@ class ModeloRepository():
         
         if not idModelo:
             return 400,'Parâmetro idModelo é obrigatório.',''
-        data = Database()
-        dataModelos = data.SelecionarRegistro(Modelos,MDId = idModelo)
-        if len(dataModelos) == 0:
+        BaseDados = Database()
+        RegistroModelos = BaseDados.SelecionarRegistro(Modelos,MDId = idModelo)
+        if len(RegistroModelos) == 0:
             return 400,f'Não foi encontrado o registro do modelo, Id: {idModelo}',''
-        return 200,'',dataModelos
+        return 200,'',RegistroModelos
     
     
     def RecomendacaoProdutosTotal(self):
-        idModelo = self.request.get('idModelo')
-        if not idModelo:
+        IdModelo = self.Requisicao.get('idModelo')
+        if not IdModelo:
             return 400,'Parâmetro idModelo é obrigatório.'
         
-        if not isinstance(idModelo,int):
+        if not isinstance(IdModelo,int):
             return 400,'Parâmetro idModelo deve ser do tipo inteiro.'
         
         
-        response,message,dataModelo = self.BuscarModeloPorId(idModelo)
-        if response == 400:
-            return response,message
+        Resposta,Mensagem,RegistroModelos = self.BuscarModeloPorId(IdModelo)
+        if Resposta == 400:
+            return Resposta,Mensagem
     
         
-        self.Modelo = joblib.load(io.BytesIO(dataModelo[0]['arquivo']))
+        self.Modelo = joblib.load(io.BytesIO(RegistroModelos[0]['arquivo']))
 
-        self.TfidfVectorizer = joblib.load(io.BytesIO(dataModelo[0]['vetor_tf']))
+        self.TfidfVectorizer = joblib.load(io.BytesIO(RegistroModelos[0]['vetor_tf']))
 
-        self.pca = joblib.load(io.BytesIO(dataModelo[0]['pca']))
+        self.Pca = joblib.load(io.BytesIO(RegistroModelos[0]['pca']))
 
-        self.Scaler = joblib.load(io.BytesIO(dataModelo[0]['scaler']))
+        self.Scaler = joblib.load(io.BytesIO(RegistroModelos[0]['scaler']))
 
-        self.Encoder = joblib.load(io.BytesIO(dataModelo[0]['encoder']))
+        self.Encoder = joblib.load(io.BytesIO(RegistroModelos[0]['encoder']))
         
-        stringTeste = io.BytesIO(dataModelo[0]['arquivo_produtos_alterados'])
+        CSVTexto = io.BytesIO(RegistroModelos[0]['arquivo_produtos_alterados'])
         
-        self.DataSet = pd.read_csv(stringTeste, delimiter=';', encoding='ISO-8859-1')
+        self.DataSet = pd.read_csv(CSVTexto, delimiter=';', encoding='ISO-8859-1')
 
-        todas_recomendacoes = []
-        iguais_departamento_secao = 0
-        iguais_qtde_embalagem = 0
-        iguais_peso_unitario = 0
+        TotalRecomendacoes = []
+        QtdeDepartamentoESecao = 0
+        QtdeEmbalagem = 0
+        QtdePesoUnitario = 0
         QtdeTotalRecomendacoes = 0
         
-        for index, produto in self.DataSet.iterrows():
-            codigo_produto = produto['CodigoProduto']
-            descricao = produto['DescricaoProduto']
-            peso_embalagem_unitaria = produto['PesoEmbalagemUnitaria']
-            qtde_embalagem = produto['QtdeEmbalagem']
-            cod_departamento = produto['CodDepartamento']
-            cod_secao = produto['CodSecao']
+        for Index, Produto in self.DataSet.iterrows():
+            CodigoProdutoBase = Produto['CodigoProduto']
+            DescricaoProdutoBase = Produto['DescricaoProduto']
+            PesoEmbalagemUnitarioProdutoBase = Produto['PesoEmbalagemUnitaria']
+            QtdeEmbalagemProdutoBase = Produto['QtdeEmbalagem']
+            CodDepartamentoProdutoBase = Produto['CodDepartamento']
+            CodSecaoProdutoBase = Produto['CodSecao']
             
-            tfidf_matrix = self.TfidfVectorizer.transform([descricao])
-            tfidf_reduced = self.pca.transform(tfidf_matrix.toarray())
+            tfidf_matrix = self.TfidfVectorizer.transform([DescricaoProdutoBase])
+            tfidf_reduced = self.Pca.transform(tfidf_matrix.toarray())
             
-            variaveis_numericas = pd.DataFrame([[peso_embalagem_unitaria, qtde_embalagem]], columns=['PesoEmbalagemUnitaria', 'QtdeEmbalagem'])
-            variaveis_categoricas = pd.DataFrame([[cod_departamento, cod_secao]], columns=['CodDepartamento', 'CodSecao'])
+            VariaveisNumericas = pd.DataFrame([[PesoEmbalagemUnitarioProdutoBase, QtdeEmbalagemProdutoBase]], columns=['PesoEmbalagemUnitaria', 'QtdeEmbalagem'])
+            VariaveisCategoricas = pd.DataFrame([[CodDepartamentoProdutoBase, CodSecaoProdutoBase]], columns=['CodDepartamento', 'CodSecao'])
             
-            variaveis_numericas_escaladas = self.Scaler.transform(variaveis_numericas) * np.array([5, 8])
-            variaveis_categoricas_codificadas = self.Encoder.transform(variaveis_categoricas)
+            VariaveisNumericasEscaladas = self.Scaler.transform(VariaveisNumericas) * np.array([5, 8])
+            VariveisCategoricasCodificadas = self.Encoder.transform(VariaveisCategoricas)
             
-            features_produto = np.hstack([tfidf_reduced, variaveis_categoricas_codificadas, variaveis_numericas_escaladas])
+            FeaturesCombinadas = np.hstack([tfidf_reduced, VariveisCategoricasCodificadas, VariaveisNumericasEscaladas])
             
-            distancias, indices = self.Modelo.kneighbors(features_produto)
+            Distancias, Indices = self.Modelo.kneighbors(FeaturesCombinadas)
             
             informacoes_produto_base = {
-                "CodigoProduto": codigo_produto,
-                "Descricao": produto['DescricaoProduto'],
-                "PesoUnitario": float(produto['PesoEmbalagemUnitaria']),
-                "QtdeEmbalagem": int(produto['QtdeEmbalagem']),
-                "Secao": produto['DescricaoSecao'],
-                "Departamento": produto['DescricaoDepartamento'],
-                "Marca": produto['Marca']
+                "CodigoProduto": CodigoProdutoBase,
+                "Descricao": Produto['DescricaoProduto'],
+                "PesoUnitario": float(Produto['PesoEmbalagemUnitaria']),
+                "QtdeEmbalagem": int(Produto['QtdeEmbalagem']),
+                "Secao": Produto['DescricaoSecao'],
+                "Departamento": Produto['DescricaoDepartamento'],
+                "Marca": Produto['Marca']
             }
 
-            produtos_informacoes_lista = []
-            for i, CodigoProdutoRecomendado in enumerate(self.DataSet.iloc[indices[0]]['CodigoProduto'].tolist()):
-                if CodigoProdutoRecomendado != codigo_produto and distancias[0][i] < 0.92:  # Filtragem pela distância
-                    produto_recomendado = self.DataSet[self.DataSet['CodigoProduto'] == CodigoProdutoRecomendado]
-                    if len(produto_recomendado) > 0:
-                        peso_recomendado = float(produto_recomendado['PesoEmbalagemUnitaria'].values[0])
-                        peso_unitario_base = float(produto['PesoEmbalagemUnitaria'])
-                        margem_relativa = 0.10 * peso_unitario_base
+            ProdutosInformacoesLista = []
+            for i, CodigoProdutoRecomendado in enumerate(self.DataSet.iloc[Indices[0]]['CodigoProduto'].tolist()):
+                if CodigoProdutoRecomendado != CodigoProdutoBase and Distancias[0][i] < 0.92:  # Filtragem pela distância
+                    ProdutoRecomendado = self.DataSet[self.DataSet['CodigoProduto'] == CodigoProdutoRecomendado]
+                    if len(ProdutoRecomendado) > 0:
+                        PesoRecomendado = float(ProdutoRecomendado['PesoEmbalagemUnitaria'].values[0])
+                        PesoUnitarioBase = float(Produto['PesoEmbalagemUnitaria'])
+                        MargemRelativa = 0.10 * PesoUnitarioBase
 
-                        peso_unitario_minimo = peso_unitario_base - margem_relativa
-                        peso_unitario_maximo = peso_unitario_base + margem_relativa
+                        PesoUnitarioMaximo = PesoUnitarioBase - MargemRelativa
+                        PesoUnitarioMinimo = PesoUnitarioBase + MargemRelativa
 
-                        informacoes_produto = {
+                        InformacoesProduto = {
                             "CodigoProduto": CodigoProdutoRecomendado,
-                            "Descricao": produto_recomendado['DescricaoProduto'].values[0],
-                            "PesoUnitario": peso_recomendado,
-                            "QtdeEmbalagem": int(produto_recomendado['QtdeEmbalagem'].values[0]),
-                            "Secao": produto_recomendado['DescricaoSecao'].values[0],
-                            "Departamento": produto_recomendado['DescricaoDepartamento'].values[0],
-                            "Marca": produto_recomendado['Marca'].values[0]
+                            "Descricao": ProdutoRecomendado['DescricaoProduto'].values[0],
+                            "PesoUnitario": PesoRecomendado,
+                            "QtdeEmbalagem": int(ProdutoRecomendado['QtdeEmbalagem'].values[0]),
+                            "Secao": ProdutoRecomendado['DescricaoSecao'].values[0],
+                            "Departamento": ProdutoRecomendado['DescricaoDepartamento'].values[0],
+                            "Marca": ProdutoRecomendado['Marca'].values[0]
                         }
-                        produtos_informacoes_lista.append(informacoes_produto)
+                        ProdutosInformacoesLista.append(InformacoesProduto)
                         QtdeTotalRecomendacoes += 1
 
-                        if (produto_recomendado['CodDepartamento'].values[0] == cod_departamento and 
-                            produto_recomendado['CodSecao'].values[0] == cod_secao):
-                            iguais_departamento_secao += 1
+                        if (ProdutoRecomendado['CodDepartamento'].values[0] == CodDepartamentoProdutoBase and 
+                            ProdutoRecomendado['CodSecao'].values[0] == CodSecaoProdutoBase):
+                            QtdeDepartamentoESecao += 1
 
-                        if produto_recomendado['QtdeEmbalagem'].values[0] == qtde_embalagem:
-                            iguais_qtde_embalagem += 1
+                        if ProdutoRecomendado['QtdeEmbalagem'].values[0] == QtdeEmbalagemProdutoBase:
+                            QtdeEmbalagem += 1
 
-                        if peso_unitario_minimo <= peso_recomendado <= peso_unitario_maximo:
-                            iguais_peso_unitario += 1
+                        if PesoUnitarioMaximo <= PesoRecomendado <= PesoUnitarioMinimo:
+                            QtdePesoUnitario += 1
 
-            if len(produtos_informacoes_lista) > 0:
-                todas_recomendacoes.append({
+            if len(ProdutosInformacoesLista) > 0:
+                TotalRecomendacoes.append({
                     "ProdutoBase": informacoes_produto_base,
-                    "Recomendacoes": produtos_informacoes_lista
+                    "Recomendacoes": ProdutosInformacoesLista
                 })
 
         if QtdeTotalRecomendacoes > 0:
-            porcentagem_iguais_departamento_secao = (iguais_departamento_secao / QtdeTotalRecomendacoes) * 100
-            porcentagem_iguais_qtde_embalagem = (iguais_qtde_embalagem / QtdeTotalRecomendacoes) * 100
-            porcentagem_iguais_peso_unitario = (iguais_peso_unitario / QtdeTotalRecomendacoes) * 100
+            PorcentagemDepartamentoESecaoIguais = (QtdeDepartamentoESecao / QtdeTotalRecomendacoes) * 100
+            PorcentagemQtdeEmbalagemIguais = (QtdeEmbalagem / QtdeTotalRecomendacoes) * 100
+            PorcentagemPesoUnitarioIguais = (QtdePesoUnitario / QtdeTotalRecomendacoes) * 100
         else:
-            porcentagem_iguais_departamento_secao = 0.0
-            porcentagem_iguais_qtde_embalagem = 0.0
-            porcentagem_iguais_peso_unitario = 0.0
+            PorcentagemDepartamentoESecaoIguais = 0.0
+            PorcentagemQtdeEmbalagemIguais = 0.0
+            PorcentagemPesoUnitarioIguais = 0.0
             
-        json = {"RecomendacaoProdutos":todas_recomendacoes,"Testes":{
-            "PorcentagemIguaisDepartamentoESecao": porcentagem_iguais_departamento_secao,
-            "PorcentagemQtdeEmbalagem": porcentagem_iguais_qtde_embalagem,
-            "PorcentagemPesoUnitarioAproximados": porcentagem_iguais_peso_unitario
+        JsonFinal = {"RecomendacaoProdutos":TotalRecomendacoes,"Testes":{
+            "PorcentagemIguaisDepartamentoESecao": PorcentagemDepartamentoESecaoIguais,
+            "PorcentagemQtdeEmbalagem": PorcentagemQtdeEmbalagemIguais,
+            "PorcentagemPesoUnitarioAproximados": PorcentagemPesoUnitarioIguais
         }}
-        return 200, json
+        return 200, JsonFinal
