@@ -27,21 +27,10 @@ try:
     # Acessando a seção 'Parametros'
     if 'Parametros' in conf_obj:
         config = conf_obj['Parametros']
-        UrlPastaModelos = config.get('UrlPastaModelos', None)
-        UrlPastaParametros = config.get('UrlPastaParametros', None)
-        UrlPastaDataSet = config.get('UrlPastaDataSet', None)
         ip = config.get('ip', None)
         porta = config.get('porta', None)
         stringGeracaoJWT = config.get('StringCodificacaoJWT',None)
         
-        if UrlPastaModelos is None:
-            raise ValueError("Chave 'UrlPastaModelos' não encontrada na seção [Parametros].")
-        
-        if UrlPastaParametros is None:
-            raise ValueError("Chave 'UrlPastaParametros' não encontrada na seção [Parametros].")
-        
-        if UrlPastaDataSet is None:
-            raise ValueError("Chave 'UrlPastaDataSet' não encontrada na seção [Parametros].")
         
         if ip is None:
             raise ValueError("Chave 'ip' não encontrada na seção [Parametros].")
