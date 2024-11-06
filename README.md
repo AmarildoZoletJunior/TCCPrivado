@@ -36,27 +36,27 @@ Este projeto tem como foco criar um algoritmo de recomendação de produtos com 
 # Requisitos do Projeto
 ## Requisitos Funcionais
 ### 1. Manipulação de Arquivos CSV
-* O sistema deve permitir o upload de arquivos no formato CSV para a base de dados.
-* O sistema deve possibilitar a remoção de arquivos CSV da base de dados.
+* O sistema deve permitir o upload de arquivos no formato CSV.
+* O sistema deve possibilitar a remoção de arquivos CSV.
 
 ### 2. Tratamento de Dados
 * O sistema deve permitir que o usuário edite valores específicos em campos de um arquivo CSV.
 * O sistema deve possibilitar a remoção de valores específicos em campos de um arquivo CSV.
 * O sistema deve permitir a substituição de valores específicos em campos de um arquivo CSV.
-* O sistema deve possibilitar a exclusão de registros de tratamento de dados de um arquivo CSV específico.
+* O sistema deve possibilitar a exclusão de registros de um arquivo CSV.
 
 ### 3. Treinamento
-* O sistema deve buscar e aplicar automaticamente todos os registros de tratamento de dados previamente definidos para o dataset alvo.
-* O sistema deve realizar o treinamento de um modelo de recomendação com base nos dados tratados do dataset alvo.
+* O sistema deve buscar e aplicar todos os devidos tratamentos de dados na base de dados escolhida pelo usuário.
+* O sistema deve realizar o treinamento de um modelo de recomendação de produtos usando a base de dados escolhida pelo usuário.
 
 ### 4. Recomendação
 * O sistema deve recomendar produtos relacionados a um produto específico disponível na base de dados. 
-* O sistema deve fornecer recomendações de produtos específicos com base no código do produto solicitado.
+* O sistema deve fornecer recomendações de produtos específicos com base no código do produto escolhido pelo usuário.
 
 
 ## Requisitos Não Funcionais
 ### 1. Usabilidade
-* RNF1 - Interface Intuitiva (API e Dashboard): A API deve ter endpoints bem documentados (por exemplo, utilizando Swagger ou API Blueprint), para facilitar a compreensão e utilização por desenvolvedores. Caso haja uma interface gráfica (dashboard), ela deve ser intuitiva e de fácil navegação.
+* RNF1 - Interface Intuitiva (API): A API deve ter endpoints bem documentados (por exemplo, utilizando Swagger ou API Blueprint), para facilitar a compreensão e utilização por desenvolvedores.
 * RNF2 - Documentação Completa: A API deve ser acompanhada por uma documentação clara e detalhada, explicando todos os endpoints, parâmetros, exemplos de uso e códigos de resposta.
 ### 2. Confiabilidade
 * RNF3 - Tolerância a Falhas: O sistema deve ser resiliente, garantindo que falhas em um módulo não comprometam o funcionamento de outros módulos. Ele deve ser capaz de retomar o processamento após falhas e salvar o estado das operações críticas.
