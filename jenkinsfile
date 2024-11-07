@@ -5,6 +5,8 @@ pipeline {
         stage('Preparação') {
             steps {
                 script {
+                    echo "Verificando conteúdo do diretório..."
+                    bat "dir" 
                     echo "Preparando o ambiente Docker..."
                     bat "docker build -f testes.dockerfile -t coberturateste ."
                 }
