@@ -4,6 +4,8 @@ from configparser import ConfigParser
 config_file = r'C:\Users\amjun\Desktop\Catolica\TCC\TCCPrivado\src\config\config.ini'
 # config_file = r'<Letra do Disco>:\<NomeDaPastaDeUsuarios>\<NomeDoUsuario>\Desktop\<NomeDaPasta>\TCCPrivado\src\config\config.ini
 
+
+
 conf_obj = ConfigParser()
 
 if os.path.exists(config_file):

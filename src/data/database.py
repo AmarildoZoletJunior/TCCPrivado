@@ -1,4 +1,5 @@
 
+import sys
 import urllib
 
 from sqlalchemy import MetaData, create_engine
@@ -19,6 +20,7 @@ class Database:
         self.engine = self.ConectarBancoDados()
         if isinstance(self.engine, str):
             print(self.engine)
+            sys.exit(1)
         else:
             self.Sessao = sessionmaker(bind=self.engine)
             self.VerificarTabelas()
@@ -45,6 +47,7 @@ class Database:
             return engine
         except Exception as e:
             error_message = f'Ocorreu um erro ao conectar-se ao banco de dados: {str(e)}'
+            
             return error_message
         
         

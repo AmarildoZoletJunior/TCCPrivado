@@ -1,9 +1,7 @@
 import datetime
-import io
 from functools import wraps
 
 import jwt
-import pandas as pd
 from flasgger import Swagger
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -14,12 +12,17 @@ from src.repositories.ArquivoRepository import ArquivoRepository
 from src.repositories.ModeloRepository import ModeloRepository
 from src.repositories.UsuarioRepository import UserRepository
 
-data = Database()
-app = Flask(__name__)
-swagger = Swagger(app)
-CORS(app)
 
+
+app = Flask(__name__)
 secret = configuration.stringGeracaoJWT
+
+def create_app():
+    swagger = Swagger(app)
+    CORS(app)
+    data = Database()
+
+
 
 # region Usuario
 @app.route("/",methods=['GET'])
@@ -223,7 +226,7 @@ def RemoverModelo(IdModelo):
         Resposta,Mensagem = ModeloRep.RemoverModelo(IdModelo)
         if Resposta == 400:
             return jsonify({'Erro': Mensagem}), 400
-        return jsonify({'Mensagem':'Seu modelo foi gerado com sucesso.'}), 200
+        return jsonify({'Mensagem':'Seu modelo foi removido com sucesso.'}), 200
     except Exception as Erro:
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500 
     
@@ -541,4 +544,5 @@ def ListarDataSet(IdDataSet):
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
 if __name__ == '__main__':
-    app.run(host=configuration.ip, port=configuration.porta)
+    create_app()
+    app.run(host=configuration.ip, port=configuration.porta,debug=True)
