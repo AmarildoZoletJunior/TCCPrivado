@@ -1,9 +1,9 @@
 import os
 from configparser import ConfigParser
 
-config_file = r'C:\Users\amjun\Desktop\Catolica\TCC\TCCPrivado\src\config\config.ini'
+config_file = r'./src/config/config.ini'
 # config_file = r'<Letra do Disco>:\<NomeDaPastaDeUsuarios>\<NomeDoUsuario>\Desktop\<NomeDaPasta>\TCCPrivado\src\config\config.ini
-
+# config_file = r'config.ini'
 
 
 conf_obj = ConfigParser()

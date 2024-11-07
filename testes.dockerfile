@@ -10,11 +10,11 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
+# Instalar Poetry via pip
+RUN pip install poetry
 
-# Adicionar o Poetry ao PATH
-ENV PATH="$HOME/.poetry/bin:$PATH"
+# Verificar se o Poetry foi instalado corretamente
+RUN poetry --version
 
 # Definir o diretório de trabalho
 WORKDIR /app
