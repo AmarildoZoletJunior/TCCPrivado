@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "CoberturaTeste" 
+    }
+
+    stages {
+        stage('Preparação') {
+            steps {
+                script {
+                    echo "Preparando o ambiente Docker..."
+                    bat "docker build -f testes.dockerfile -t ${IMAGE_NAME} ."
+                }
+            }
+        }
+
+        stage('Rodar Testes') {
+            steps {
+                script {
+                    echo "Executando os testes dentro do contêiner Docker..."
+                    bat "docker run --rm -v %cd%/test-results:/app/test-results ${IMAGE_NAME} poetry run pytest --junitxml=/app/test-results/results.xml"
+                }
+            }
+        }
+
+        stage('Publicar Resultados') {
+            steps {
+                script {
+                    echo "Publicando resultados dos testes..."
+                    junit 'test-results/results.xml'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Limpando ambiente...'
+            bat "docker rmi ${IMAGE_NAME}"
+        }
+    }
+}
