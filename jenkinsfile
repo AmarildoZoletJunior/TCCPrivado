@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "CoberturaTeste" 
+        IMAGE_NAME = "coberturateste" 
     }
 
     stages {
