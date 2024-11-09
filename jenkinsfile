@@ -5,10 +5,8 @@ pipeline {
         stage('Preparação') {
             steps {
                 script {
-                    echo "Verificando conteúdo do diretório..."
-                    ps "dir" 
                     echo "Preparando o ambiente Docker..."
-                    ps "docker build -f testes.dockerfile -t coberturateste ."
+                    sh "docker build -f testes.dockerfile -t coberturateste ."
                 }
             }
         }
@@ -17,7 +15,7 @@ pipeline {
             steps {
                 script {
                     echo "Executando os testes dentro do contêiner Docker..."
-                    ps "docker run --rm -v %cd%/test-results:/app/test-results coberturateste poetry run pytest --junitxml=/app/test-results/results.xml"
+                    sh "docker run --rm -v %cd%/test-results:/app/test-results coberturateste poetry run pytest --junitxml=/app/test-results/results.xml"
                 }
             }
         }
