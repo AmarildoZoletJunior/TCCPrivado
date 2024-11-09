@@ -61,7 +61,7 @@ def criarTokenJWT(user_id):
     }, app.config['SECRET_KEY'], algorithm="HS256")
     return Token
 
-
+ 
 
 @app.route("/login",methods=['POST'])
 def EntrarNaConta():
