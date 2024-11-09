@@ -134,6 +134,8 @@ classDiagram
 
 ### CI/CD
 * Jenkins
+  *  Ngrok
+* Docker
 
 ### Testes de qualidade
 * PyUnit: É uma biblioteca para realização de testes unitários em Python baseada na arquitetura xUnit. É a forma mais difundida para realizar a prática de testes unitários pela comunidade Python.
@@ -170,7 +172,7 @@ Para clonar o repositório, você precisa ter o Git Bash, GitHub Desktop ou se p
       * Senha: admin
     * Após isto, em todo Endpoint que está protegido, faça autenticação utilizando a header `Authorization` e o valor inicial `Bearer SEU-TOKEN`
 
-# Alertas e Recomendações
+# Alertas e Recomendações 
 > [!WARNING]
 > As recomendações dependem 100% da qualidade dos dados, então esteja ciente que você deve ter um dataset que tenha pelo menos duas features, e que exista alguma similaridade entre os dados de cada feature.
 
