@@ -135,6 +135,7 @@ classDiagram
 ### CI/CD
 * Jenkins
   *  Ngrok
+* Docker
 
 ### Testes de qualidade
 * PyUnit: É uma biblioteca para realização de testes unitários em Python baseada na arquitetura xUnit. É a forma mais difundida para realizar a prática de testes unitários pela comunidade Python.
