@@ -2,32 +2,26 @@ pipeline {
     agent any
 
     stages {
-        stage('Instalação docker'){
+        stage('Baixando o repositorio') {
+            steps {
+                git 'https://github.com/AmarildoZoletJunior/TCCPrivado'
+
+            }
+        }
+        stage('Instalando dependências'){
             steps{
-                script{
-                    RUN curl -fsSLO https://get.docker.com/builds/Linux/x86_64/docker-17.04.0-ce.tgz \
-                    && tar xzvf docker-17.04.0-ce.tgz \
-                    && mv docker/docker /usr/local/bin \
-                    && rm -r docker docker-17.04.0-ce.tgz
-                }
+                sh 'python3 -m venv .venv'
+                sh 'pip3 install poetry --break-system-packages'
             }
         }
-
-        stage('Preparação') {
-            steps {
-                script {
-                    echo "Preparando o ambiente Docker..."
-                    sh "docker build -f testes.dockerfile -t coberturateste ."
-                }
+        stage('Instalando bibliotecas'){
+            steps{
+                sh 'poetry install'
             }
         }
-
-        stage('Rodar Testes') {
-            steps {
-                script {
-                    echo "Executando os testes dentro do contêiner Docker..."
-                    sh "docker run --rm -v %cd%/test-results:/app/test-results coberturateste poetry run pytest --junitxml=/app/test-results/results.xml"
-                }
+       stage('Rodando testes'){
+            steps{
+                sh 'poetry run pytest --junitxml=results.xml'
             }
         }
     }
