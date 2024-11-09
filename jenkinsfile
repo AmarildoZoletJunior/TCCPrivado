@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Configurando máquina'){
             steps {
-                sh 'apt-get update'
                 sh 'apt-get install -y python3 python3-pip python3.11-venv'
             }
         }
