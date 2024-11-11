@@ -25,4 +25,4 @@ jobs:
         run: chmod +x ./app.py
 
       - name: Rodar Aplicação
-        run: poetry run ./app.py
+        run: poetry run app.py
