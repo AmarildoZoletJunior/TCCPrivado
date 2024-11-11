@@ -24,5 +24,8 @@ jobs:
       - name: Conceder permissão de execução ao serviço
         run: chmod +x ./app.py
 
+      - name: Visualizar Pastas
+        run: echo $(ls)
+
       - name: Rodar Aplicação
         run: poetry run app.py
