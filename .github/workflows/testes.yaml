@@ -1,0 +1,28 @@
+name: Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Instalar Poetry
+        run: pip install poetry
+
+      - name: Instalar Dependencias
+        run: poetry install
+
+      - name: Conceder permissão de execução ao serviço
+        run: chmod +x ./app.py
+
+      - name: Rodar Aplicação
+        run: poetry run ./app.py
