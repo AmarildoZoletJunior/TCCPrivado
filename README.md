@@ -133,8 +133,7 @@ classDiagram
   
 
 ### CI/CD
-* Jenkins
-  *  Ngrok
+* GitHub Actions
 * Docker
 
 ### Testes de qualidade
