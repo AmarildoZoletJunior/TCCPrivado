@@ -35,3 +35,6 @@ jobs:
 
       - name: Build da imagem
         run: docker build -t ghcr.io/amarildozoletjunior/tccprivado:"$(cat docker-settings.json | jq -r .version)" .
+
+      - name: Enviando imagem ao repositório
+        run: docker push ghcr.io/amarildozoletjunior/tccprivado:"$(cat docker-settings.json | jq -r .version)"
