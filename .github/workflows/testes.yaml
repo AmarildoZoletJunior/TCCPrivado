@@ -32,3 +32,6 @@ jobs:
 
       - name: Login no github container registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build da imagem
+        run: docker build -t ghcr.io/AmarildoZoletJunior/TCCPrivado:"$(cat deploy-settings.json | jq -r .version)"
