@@ -3,5 +3,3 @@ src/arquivos/modelos/*
 src/arquivos/outros/*
 src/arquivos/parametros/*
 src/config/config.ini
-
-dockerfile
