@@ -42,14 +42,11 @@ jobs:
         run: docker push ghcr.io/amarildozoletjunior/tccprivado:"$(cat docker-settings.json | jq -r .version)"
 
       - name: Login no Docker Hub
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build da imagem
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/tccprivado:"$(cat docker-settings.json | jq -r .version)" .
+      # - name: Build da imagem
+      #   run: docker build -t ${{ secrets.DOCKER_USERNAME }}/tccprivado:"$(cat docker-settings.json | jq -r .version)" .
 
-      - name: Enviando imagem ao Docker Hub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/tccprivado:"$(cat docker-settings.json | jq -r .version)"
+      # - name: Enviando imagem ao Docker Hub
+      #   run: docker push ${{ secrets.DOCKER_USERNAME }}/tccprivado:"$(cat docker-settings.json | jq -r .version)"
 
