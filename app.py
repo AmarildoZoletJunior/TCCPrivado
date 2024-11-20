@@ -7,6 +7,7 @@ import jwt
 from flasgger import Swagger
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import bcrypt
 
 from src.config import configuration
 from src.data.database import Database
@@ -57,29 +58,59 @@ def tokenNecessario(f):
     return decorated
 
 def criarTokenJWT(user_id):
+    exp_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
     Token = jwt.encode({
-        'user_id': user_id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-    }, app.config['SECRET_KEY'], algorithm="HS256")
+        'user_id': str(user_id),
+        'exp': int(exp_time.timestamp())
+    }, secret, algorithm="HS256")
+    print("aqui passou 02")
     return Token
 
- 
+def hash_senha(senha):
+    return bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
 
-@app.route("/login",methods=['POST'])
+def verificar_senha(senha, hash_armazenado):
+    return bcrypt.checkpw(senha.encode('utf-8'), hash_armazenado)
+
+@app.route("/criar/usuario", methods=['POST'])
+def RegistrarConta():
+    try:
+        Dados = request.get_json(force=True)
+        senha = Dados.get('senha')
+
+        if not senha:
+            return jsonify({'Erro': 'Senha é necessária'}), 400
+        Dados['senha'] = hash_senha(senha).decode('utf-8')
+
+        UserRep = UserRepository(Dados)
+        Resposta, Mensagem = UserRep.CreateUser()
+        if Resposta == 400:
+            return jsonify({'Erro': Mensagem}), 400
+        else:
+            return jsonify({'Mensagem': 'Usuário cadastrado com sucesso'}), 200
+    except Exception as Erro:
+        return jsonify({'Erro': f'Ocorreu um erro, erro: {Erro}'}), 500
+
+@app.route("/login", methods=['POST'])
 def EntrarNaConta():
     try:
         Dados = request.get_json(force=True)
+        senha = Dados.get('password')
+        if not senha:
+            return jsonify({'Erro': 'Senha é necessária'}), 400
+
         UserRep = UserRepository(Dados)
         Resposta, Mensagem = UserRep.ValidUser()
         if not Resposta:
             return jsonify({'Erro': Mensagem}), 400
         ListaUsuario = UserRep.FindUser()
-
         if ListaUsuario and isinstance(ListaUsuario, list) and len(ListaUsuario) > 0:
             Usuario = ListaUsuario[0]
-            IdUsuario = Usuario.get('USUid')
+            senha_hash = Usuario.get('password')
+            if not verificar_senha(senha, senha_hash.encode('utf-8')):
+                return jsonify({'Erro': 'Senha incorreta'}), 401
+            IdUsuario = Usuario.get('id')
             Token = criarTokenJWT(IdUsuario)
-
             return jsonify({
                 'Mensagem': 'Usuário encontrado com sucesso',
                 'token': Token
@@ -89,22 +120,6 @@ def EntrarNaConta():
 
     except Exception as Erro:
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500
-    
-    
-    
-    
-@app.route("/criar/usuario",methods=['POST'])
-def RegistrarConta():
-    try:
-        Dados = request.get_json(force=True)
-        UserRep = UserRepository(Dados)
-        Resposta,Mensagem = UserRep.CreateUser()
-        if Resposta == 400:
-            return jsonify({'Erro': Mensagem}), 400
-        else:
-            return jsonify({'Mensagem': f'Usuário cadastrado com sucesso'}), 200
-    except Exception as Erro:
-        return jsonify({'Erro': f'Ocorreu um erro, erro: {Erro}'}), 500
     
     
 @app.route("/atualizar/senha",methods=['PUT'])
@@ -123,7 +138,8 @@ def ResetSenha():
 # endregion                 
   
 @app.route("/gerarModelo", methods=['POST'])
-def GeracaoModelo():
+@tokenNecessario
+def GeracaoModelo(UsuarioAtual):
     """
     Gerar modelo de recomendação
     ---
@@ -189,8 +205,9 @@ def GeracaoModelo():
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500 
     
     
-@app.route("/removerModelo/<int:IdModelo>", methods=['DELETE']) #OK
-def RemoverModelo(IdModelo):
+@app.route("/removerModelo/<int:IdModelo>", methods=['DELETE'])
+@tokenNecessario
+def RemoverModelo(UsuarioAtual,IdModelo):
     """
     Deletar modelo de recomendação
     ---
@@ -233,8 +250,9 @@ def RemoverModelo(IdModelo):
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500 
     
     
-@app.route("/recomendarProdutos", methods=['POST']) #OK
-def RecomendarTodosProdutosModelo():
+@app.route("/recomendarProdutos", methods=['POST'])
+@tokenNecessario
+def RecomendarTodosProdutosModelo(UsuarioAtual):
     """
     Recomendar todos os produtos 
     ---
@@ -287,8 +305,9 @@ def RecomendarTodosProdutosModelo():
     except Exception as Erro:
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500    
     
-@app.route("/recomendarProduto", methods=['POST']) #OK
-def RecomendarProdutoReferenciado():
+@app.route("/recomendarProduto", methods=['POST'])
+@tokenNecessario
+def RecomendarProdutoReferenciado(UsuarioAtual):
     """
     Recomendar produtos similares a um único produto
     ---
@@ -350,8 +369,9 @@ def RecomendarProdutoReferenciado():
   
   
   
-@app.route("/cadastrarDataSet", methods=['POST']) #OK
-def CadastrarDataSet():
+@app.route("/cadastrarDataSet", methods=['POST'])
+@tokenNecessario
+def CadastrarDataSet(UsuarioAtual):
     """
     Gerar modelo de recomendação
     ---
@@ -413,8 +433,9 @@ def CadastrarDataSet():
     except Exception as Erro:
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
-@app.route("/removerDataSet/<int:CodigoDataSet>", methods=['DELETE']) #OK
-def RemoverDataSet(CodigoDataSet):
+@app.route("/removerDataSet/<int:CodigoDataSet>", methods=['DELETE'])
+@tokenNecessario
+def RemoverDataSet(UsuarioAtual,CodigoDataSet):
     """
     Deletar DataSet de produtos
     ---
@@ -455,8 +476,9 @@ def RemoverDataSet(CodigoDataSet):
     except Exception as Erro:
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
-@app.route("/listaDataSets", methods=['GET']) #OK
-def ListaDataSets():
+@app.route("/listaDataSets", methods=['GET'])
+@tokenNecessario
+def ListaDataSets(UsuarioAtual):
     """
     Lista de DataSets de produtos
     ---
@@ -497,8 +519,9 @@ def ListaDataSets():
     except Exception as Erro:
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
-@app.route("/dataSet/<int:IdDataSet>", methods=['GET']) #OK
-def ListarDataSet(IdDataSet):
+@app.route("/dataSet/<int:IdDataSet>", methods=['GET'])
+@tokenNecessario
+def ListarDataSet(UsuarioAtual,IdDataSet):
     """
     Lista de DataSets de produtos específico
     ---
