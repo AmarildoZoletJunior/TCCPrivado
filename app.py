@@ -138,8 +138,9 @@ def ResetSenha():
 # endregion                 
   
 @app.route("/gerarModelo", methods=['POST'])
-@tokenNecessario
-def GeracaoModelo(UsuarioAtual):
+# @tokenNecessario
+def GeracaoModelo():
+# def GeracaoModelo(UsuarioAtual):
     """
     Gerar modelo de recomendação
     ---
@@ -206,8 +207,9 @@ def GeracaoModelo(UsuarioAtual):
     
     
 @app.route("/removerModelo/<int:IdModelo>", methods=['DELETE'])
-@tokenNecessario
-def RemoverModelo(UsuarioAtual,IdModelo):
+# @tokenNecessario
+def RemoverModelo(IdModelo):
+# def RemoverModelo(UsuarioAtual,IdModelo):
     """
     Deletar modelo de recomendação
     ---
@@ -251,8 +253,9 @@ def RemoverModelo(UsuarioAtual,IdModelo):
     
     
 @app.route("/recomendarProdutos", methods=['POST'])
-@tokenNecessario
-def RecomendarTodosProdutosModelo(UsuarioAtual):
+# @tokenNecessario
+def RecomendarTodosProdutosModelo():
+# def RecomendarTodosProdutosModelo(UsuarioAtual):
     """
     Recomendar todos os produtos 
     ---
@@ -306,8 +309,9 @@ def RecomendarTodosProdutosModelo(UsuarioAtual):
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500    
     
 @app.route("/recomendarProduto", methods=['POST'])
-@tokenNecessario
-def RecomendarProdutoReferenciado(UsuarioAtual):
+# @tokenNecessario
+def RecomendarProdutoReferenciado():
+# def RecomendarProdutoReferenciado(UsuarioAtual):
     """
     Recomendar produtos similares a um único produto
     ---
@@ -370,8 +374,9 @@ def RecomendarProdutoReferenciado(UsuarioAtual):
   
   
 @app.route("/cadastrarDataSet", methods=['POST'])
-@tokenNecessario
-def CadastrarDataSet(UsuarioAtual):
+# @tokenNecessario
+def CadastrarDataSet():
+# def CadastrarDataSet(UsuarioAtual):
     """
     Gerar modelo de recomendação
     ---
@@ -434,8 +439,9 @@ def CadastrarDataSet(UsuarioAtual):
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
 @app.route("/removerDataSet/<int:CodigoDataSet>", methods=['DELETE'])
-@tokenNecessario
-def RemoverDataSet(UsuarioAtual,CodigoDataSet):
+# @tokenNecessario
+def RemoverDataSet(CodigoDataSet):
+# def RemoverDataSet(UsuarioAtual,CodigoDataSet):
     """
     Deletar DataSet de produtos
     ---
@@ -477,8 +483,9 @@ def RemoverDataSet(UsuarioAtual,CodigoDataSet):
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
 @app.route("/listaDataSets", methods=['GET'])
-@tokenNecessario
-def ListaDataSets(UsuarioAtual):
+# @tokenNecessario
+def ListaDataSets():
+# def ListaDataSets(UsuarioAtual):
     """
     Lista de DataSets de produtos
     ---
@@ -520,8 +527,9 @@ def ListaDataSets(UsuarioAtual):
         return jsonify({'Erro': f'Ocorreu um erro: {Erro}'}), 500   
     
 @app.route("/dataSet/<int:IdDataSet>", methods=['GET'])
-@tokenNecessario
-def ListarDataSet(UsuarioAtual,IdDataSet):
+# @tokenNecessario
+def ListarDataSet(IdDataSet):
+# def ListarDataSet(UsuarioAtual,IdDataSet):
     """
     Lista de DataSets de produtos específico
     ---
