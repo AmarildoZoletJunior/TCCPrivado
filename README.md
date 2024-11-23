@@ -152,7 +152,7 @@ classDiagram
 > Este projeto utiliza SQL Server.
   1. Baixe o SQL Server neste link: https://www.microsoft.com/pt-br/sql-server/sql-server-downloads
   2. Inicie sua instância do SQL Server.
-  3. Abra o arquivo conf.ini que tem de exemplo e preencha cada variável necessária na classe ConfiguracaoBancoDados.
+  3. Se optar por baixar o repositório, abra o arquivo config.ini e altere os valores necessários para conexão com banco de dados.
      * As variáveis que devem ser preenchidas são:
        * DRIVER | Exemplo = ODBC Driver 17 for SQL Server
        * SERVER | Exemplo = localhost
@@ -181,8 +181,33 @@ OU
 ## Imagem Docker
 Você pode optar por rodar a aplicação em uma imagem docker, para isto é necessário ter instalado o docker em seu computador.
 1. Com o docker instalado, abra o CMD e digite `docker push amarildojunior/tccprivado`
-2. Após isto, digite `docker run -d --name nome_do_container -p 8080:8080 amarildojunior/tccprivado`, sendo `-p` Faz o mapeamento de porta, onde o serviço dentro do container expõe a porta 8080 e você a disponibiliza no host na mesma porta e `--name` dá um nome ao container para facilitar seu gerenciamento.
-3. Verifique se subiu corretamente o container.
+2. Após isto, digite `docker run -e DB_DRIVER="ODBC Driver 17 for SQL Server" -e DB_SERVER="host.docker.internal" -e DB_DATABASE="RecomendacaoProdutos" -e DB_USER="teste" -e DB_PASSWORD="teste" -e IP="localhost" -e PORTA="5000" -e STRING_CODIFICACAO_JWT="Teste" nome-da-imagem`
+   * `-e` comando utilizado para inserir valor a uma variável de ambiente
+     * DB_DRIVER="ODBC Driver 17 for SQL Server"
+       * O que é: O driver do banco de dados SQL Server.
+       * Exemplo: "ODBC Driver 17 for SQL Server" é o driver usado para conectar ao SQL Server.
+     * DB_SERVER="host.docker.internal"
+       * O que é: O endereço do servidor SQL (onde o banco de dados está).
+       * Exemplo: "host.docker.internal" significa que o SQL Server está rodando na mesma máquina que o contêiner.
+     * DB_DATABASE="RecomendacaoProdutos"
+       * O que é: O nome do banco de dados a ser acessado.
+       * Exemplo: "RecomendacaoProdutos" é o nome do banco de dados onde os dados ficam armazenados.
+     * DB_USER="teste"
+       * O que é: O nome de usuário para autenticação no banco de dados.
+       * Exemplo: "teste" é o nome de usuário que o aplicativo usará para se conectar ao SQL Server.
+     * DB_PASSWORD="teste"
+       * O que é: A senha do usuário para acessar o banco de dados.
+       * Exemplo: "teste" é a senha usada junto com o nome de usuário para autenticar.
+     * IP="localhost"
+       * O que é: O IP onde o aplicativo vai escutar.
+       * Exemplo: "localhost" significa que o aplicativo vai aceitar conexões de qualquer IP.
+     * PORTA="5000"
+       * O que é: A porta em que o aplicativo vai rodar.
+       * Exemplo: "5000" é a porta onde o serviço será acessado.
+     * STRING_CODIFICACAO_JWT="Teste"
+       * O que é: A chave secreta para criar e verificar tokens JWT (usados em login/segurança).
+       * Exemplo: "Teste" é uma string simples para gerar tokens JWT (em produção, use uma chave mais segura).
+3. Verifique se subiu corretamente o container e se iniciou a API.
 
 # Alertas e Recomendações 
 > [!WARNING]
