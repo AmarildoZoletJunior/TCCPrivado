@@ -139,6 +139,11 @@ classDiagram
 ### Testes de qualidade
 * PyUnit: É uma biblioteca para realização de testes unitários em Python baseada na arquitetura xUnit. É a forma mais difundida para realizar a prática de testes unitários pela comunidade Python.
    * Foram realizados diversos testes com foco em ter a porcentagem de cobertura de testes em 100%, desde em endpoints de usuário até testes em cada entidade afim de testar o fluxo de todo o CRUD.
+* Testes no algoritmo de recomendação:
+   * Foram realizados alguns testes, sendo eles:
+     * Acerto em peso unitário aproximado(utilizando uma margem de 10% de diferença, ainda é considerado certo) ao produto base = 87,07%
+     * Acerto em seção e departamento igual ao produto base = 100%
+     * Acerto em quantidade que contém na embalagem comparado ao produto base = 100%
 
 
 # Como iniciar
@@ -170,6 +175,14 @@ Para clonar o repositório, você precisa ter o Git Bash, GitHub Desktop ou se p
       * Usuário: admin
       * Senha: admin
     * Após isto, em todo Endpoint que está protegido, faça autenticação utilizando a header `Authorization` e o valor inicial `Bearer SEU-TOKEN`
+ 
+OU
+ 
+## Imagem Docker
+Você pode optar por rodar a aplicação em uma imagem docker, para isto é necessário ter instalado o docker em seu computador.
+1. Com o docker instalado, abra o CMD e digite `docker push amarildojunior/tccprivado`
+2. Após isto, digite `docker run -d --name nome_do_container -p 8080:8080 amarildojunior/tccprivado`, sendo `-p` Faz o mapeamento de porta, onde o serviço dentro do container expõe a porta 8080 e você a disponibiliza no host na mesma porta e `--name` dá um nome ao container para facilitar seu gerenciamento.
+3. Verifique se subiu corretamente o container.
 
 # Alertas e Recomendações 
 > [!WARNING]
