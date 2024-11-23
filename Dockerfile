@@ -16,7 +16,7 @@ WORKDIR /app
 
 COPY . .
 
-COPY config.ini /app/config.ini
+COPY ./src/config/config.ini /app/config.ini
 
 COPY entrypoint.sh /entrypoint.sh
 
