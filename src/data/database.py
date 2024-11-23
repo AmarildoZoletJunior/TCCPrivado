@@ -90,17 +90,14 @@ class Database:
     
     
     def AdicionarUsuarioPadrao(self):
-        # Definir usuário padrão
         default_user = {
         'USUsername': 'admin',
-            'USUpassword': self.hash_senha('admin')  # Criptografar a senha
+            'USUpassword': self.hash_senha('admin') 
         }
         
         with self.Sessao() as session:
-            # Verificar se o usuário padrão já existe
             UsuarioExistente = session.query(Usuarios).filter_by(USUsername=default_user['USUsername']).first()
             if not UsuarioExistente:
-                # Adicionar novo usuário
                 NovoUsuario = Usuarios(**default_user)
                 session.add(NovoUsuario)
                 session.commit()
