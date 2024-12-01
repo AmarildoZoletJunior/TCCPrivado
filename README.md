@@ -9,10 +9,12 @@
   * [Back-End](#Back-End)
   * [CI/CD](#CICD)
   * [Testes de Qualidade](#Testes-de-qualidade)
+  * [Resultados](#Resultados)
 * [Como iniciar o projeto](#Como-iniciar)
   * [Repositório](#Repositório)
 * [Alertas e recomendações](#Alertas-e-Recomendações)
-* [Resultados](#Resultados)
+* [Contribuições](#Contribuições)
+* [Informações](#Informações)
 
 
 # Objetivo
