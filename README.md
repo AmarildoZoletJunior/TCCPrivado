@@ -224,8 +224,8 @@ Você pode optar por rodar a aplicação em uma imagem docker, para isto é nece
 > As recomendações dependem 100% da qualidade dos dados, então esteja ciente que você deve ter um dataset que tenha pelo menos duas features, e que exista alguma similaridade entre os dados de cada feature.
 
 > [!CAUTION]
-> Para realizar novos treinamentos, somente é aceito arquivos CSV. Caso não seja importado arquivo no formato CSV, não será gerado um novo modelo treinado.
-> Para usar o algoritmo afins de realizar testes, está disponível uma base de dados em `arquivosNecessarios/BaseDados/DataSetProdutos.csv`
+> * Para realizar novos treinamentos, somente é aceito arquivos CSV. Caso não seja importado arquivo no formato CSV, não será gerado um novo modelo treinado.
+> * Para usar o algoritmo afins de realizar testes, está disponível uma base de dados em `arquivosNecessarios/BaseDados/DataSetProdutos.csv`
 
 # Contribuições
 > [!NOTE]
