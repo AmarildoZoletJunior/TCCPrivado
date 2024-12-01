@@ -231,3 +231,7 @@ Você pode optar por rodar a aplicação em uma imagem docker, para isto é nece
 > [!NOTE]
 > Para contribuir com este projeto, abra um pull request para que possamos analisar suas edições e aprovar/rejeitar.
 
+# Informações
+> [!NOTE]
+> Está disponível um json com todas as recomendações feitas, em `arquivosNecessarios/Resultados/JsonRecomendacoes.txt`
+
