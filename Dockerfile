@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -6,7 +6,13 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libffi-dev \
     python3-dev \
+    gettext \ 
     && rm -rf /var/lib/apt/lists/*
+
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql17
 
 RUN pip install poetry
 
@@ -24,8 +30,12 @@ RUN chmod +x /entrypoint.sh
 
 RUN poetry install --no-root
 
+RUN ls -al /app
+
 EXPOSE 8000
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["poetry", "run", "app.py"]
+
+
+CMD ["poetry", "run", "python", "app.py"]

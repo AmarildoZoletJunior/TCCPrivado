@@ -29,8 +29,10 @@ try:
         DRIVER = EncontrarValorVariaveis(config.get('DRIVER', None))
         SERVER = EncontrarValorVariaveis(config.get('SERVER', None))
         DATABASE = EncontrarValorVariaveis(config.get('DATABASE', None))
+        DB_USER = EncontrarValorVariaveis(config.get('DB_USER', None))
+        DB_PASSWORD = EncontrarValorVariaveis(config.get('DB_PASSWORD', None))
 
-        if DRIVER is None or SERVER is None or DATABASE is None:
+        if DRIVER is None or SERVER is None or DATABASE is None or DB_USER is None or DB_PASSWORD is None:
             raise ValueError("Alguma chave está faltando na seção [DataBase].")
 
     if 'Parametros' in conf_obj:

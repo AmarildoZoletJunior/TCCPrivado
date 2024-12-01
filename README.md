@@ -12,6 +12,7 @@
 * [Como iniciar o projeto](#Como-iniciar)
   * [Repositório](#Repositório)
 * [Alertas e recomendações](#Alertas-e-Recomendações)
+* [Resultados](#Resultados)
 
 
 # Objetivo
@@ -145,6 +146,14 @@ classDiagram
      * Acerto em seção e departamento igual ao produto base = 100%
      * Acerto em quantidade que contém na embalagem comparado ao produto base = 100%
 
+## Resultados
+* Com base em vários testes, obtive uma boa recomendação utilizando a base disponibilizada na pasta `arquivosNecessarios/BaseDados` com os seguintes parametros:
+  * Núm. PCA: 800
+  * Quantidade de recomendações: 2
+  * Distância aceitável para inclusão: 1.00 
+* Conclusão: Com base na porcentagem de acertos em cada tipo de teste realizado, o que impacta diretamente nas recomendações é o número de componentes que é colocado. O que foi verificado é que variações de 400 a 800 são as que mais trazem recomendações interessantes e mantém  a porcentagem de acertos alta.
+
+
 
 # Como iniciar
 ### Iniciar Banco de dados
@@ -184,12 +193,14 @@ Você pode optar por rodar a aplicação em uma imagem docker, para isto é nece
 2. Após isto, digite `docker run -d --name nome_do_container -p 8080:8080 amarildojunior/tccprivado`, sendo `-p` Faz o mapeamento de porta, onde o serviço dentro do container expõe a porta 8080 e você a disponibiliza no host na mesma porta e `--name` dá um nome ao container para facilitar seu gerenciamento.
 3. Verifique se subiu corretamente o container.
 
+
 # Alertas e Recomendações 
 > [!WARNING]
 > As recomendações dependem 100% da qualidade dos dados, então esteja ciente que você deve ter um dataset que tenha pelo menos duas features, e que exista alguma similaridade entre os dados de cada feature.
 
 > [!CAUTION]
 > Para realizar novos treinamentos, somente é aceito arquivos CSV. Caso não seja importado arquivo no formato CSV, não será gerado um novo modelo treinado.
+> Para usar o algoritmo afins de realizar testes, está disponível uma base de dados em `arquivosNecessarios/BaseDados/DataSetProdutos.csv`
 
 # Contribuições
 > [!NOTE]

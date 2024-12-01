@@ -40,7 +40,8 @@ class Database:
                 f"DRIVER={configuration.DRIVER};"
                 f"SERVER={configuration.SERVER};"
                 f"DATABASE={configuration.DATABASE};"
-                f"Trusted_Connection=yes;"
+                f"UID={configuration.DB_USER};"
+                f"PWD={configuration.DB_PASSWORD};"
             )
             engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}", echo=True)
             with engine.connect() as connection:
