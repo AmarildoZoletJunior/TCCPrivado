@@ -42,17 +42,11 @@ Este projeto tem como foco criar um algoritmo de recomendação de produtos com 
 * O sistema deve permitir o upload de arquivos no formato CSV.
 * O sistema deve possibilitar a remoção de arquivos CSV.
 
-### 2. Tratamento de Dados
-* O sistema deve permitir que o usuário edite valores específicos em campos de um arquivo CSV.
-* O sistema deve possibilitar a remoção de valores específicos em campos de um arquivo CSV.
-* O sistema deve permitir a substituição de valores específicos em campos de um arquivo CSV.
-* O sistema deve possibilitar a exclusão de registros de um arquivo CSV.
-
-### 3. Treinamento
+### 2. Treinamento
 * O sistema deve buscar e aplicar todos os devidos tratamentos de dados na base de dados escolhida pelo usuário.
 * O sistema deve realizar o treinamento de um modelo de recomendação de produtos usando a base de dados escolhida pelo usuário.
 
-### 4. Recomendação
+### 3. Recomendação
 * O sistema deve recomendar produtos relacionados a um produto específico disponível na base de dados. 
 * O sistema deve fornecer recomendações de produtos específicos com base no código do produto escolhido pelo usuário.
 
